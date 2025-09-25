@@ -222,7 +222,7 @@ class MockAPIService {
   // Chuyển đổi format từ format cũ sang MockAPI format
   convertToMockAPIFormat(recipeId, ingredients, menuItem, ingredientsList) {
     const mockAPIIngredients = Object.entries(ingredients).map(([ingredientId, amount]) => {
-      const ingredient = ingredientsList.find(ing => ing.id == ingredientId);
+      const ingredient = ingredientsList.find(ing => ing.id === parseInt(ingredientId));
       return {
         ingredientId: parseInt(ingredientId),
         name: ingredient?.name || 'Unknown',

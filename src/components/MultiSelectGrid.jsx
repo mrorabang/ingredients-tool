@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 const MultiSelectGrid = ({
   items = [],
@@ -25,7 +25,7 @@ const MultiSelectGrid = ({
     .filter(([_, data]) => data)
     .map(([itemId, data]) => ({
       id: itemId,
-      ...items.find(item => item.id == itemId),
+      ...items.find(item => item.id === parseInt(itemId)),
       amount: data.amount || '',
       unit: data.unit
     }));

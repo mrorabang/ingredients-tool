@@ -34,7 +34,7 @@ const InventoryPage = () => {
     const newSelectedItems = {};
     Object.keys(salesCount).forEach(itemId => {
       if (salesCount[itemId] > 0) {
-        const item = menuItems.find(item => item.id == itemId);
+        const item = menuItems.find(item => item.id === parseInt(itemId));
         if (item) {
           newSelectedItems[itemId] = {
             amount: salesCount[itemId].toString(),
@@ -186,7 +186,7 @@ const InventoryPage = () => {
         {Object.keys(usedIngredients).length > 0 ? (
           <div className="grid grid-3" style={{ gap: '1rem' }}>
             {Object.keys(usedIngredients).map(ingredientId => {
-              const ingredient = ingredients.find(ing => ing.id == ingredientId);
+              const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
               return (
                 <div key={ingredientId} className="card" style={{
                   padding: '1rem',

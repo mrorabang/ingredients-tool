@@ -17,7 +17,7 @@ const RecipeManagementPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  // const [isSaving, setIsSaving] = useState(false);
 
   // Hàm xem công thức
   const startViewing = (itemId) => {
@@ -34,7 +34,6 @@ const RecipeManagementPage = () => {
 
   // Hàm lưu công thức từ modal
   const handleSaveRecipe = async (newRecipe) => {
-    setIsSaving(true);
     try {
       await dataService.updateRecipe(editingItem, newRecipe);
       // Refresh data after saving
@@ -45,8 +44,6 @@ const RecipeManagementPage = () => {
     } catch (error) {
       console.error('Lỗi khi lưu công thức:', error);
       toastService.error('Có lỗi xảy ra khi lưu công thức!');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -200,7 +197,7 @@ const RecipeManagementPage = () => {
             }}>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>{item.name}</h4>
               {Object.keys(recipes[item.id] || {}).map(ingredientId => {
-                const ingredient = ingredients.find(ing => ing.id == ingredientId);
+                const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
                 const recipeData = recipes[item.id][ingredientId];
                 const amount = typeof recipeData === 'object' ? recipeData.amount : recipeData;
                 const unit = typeof recipeData === 'object' ? recipeData.unit : ingredient?.unit;

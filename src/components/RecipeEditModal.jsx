@@ -27,7 +27,7 @@ const RecipeEditModal = ({
           console.log(`Ingredient ${ingredientId}:`, data);
           // Xử lý cả trường hợp data là object {amount, unit} hoặc chỉ là số
           const amount = typeof data === 'object' ? data.amount : data;
-          const unit = typeof data === 'object' ? data.unit : ingredients.find(ing => ing.id == ingredientId)?.unit || 'g';
+          const unit = typeof data === 'object' ? data.unit : ingredients.find(ing => ing.id === parseInt(ingredientId))?.unit || 'g';
           
           initialSelected[ingredientId] = {
             amount: amount || '',
@@ -45,7 +45,7 @@ const RecipeEditModal = ({
     .filter(([_, data]) => data)
     .map(([ingredientId, data]) => ({
       id: ingredientId,
-      ...ingredients.find(ing => ing.id == ingredientId),
+      ...ingredients.find(ing => ing.id === parseInt(ingredientId)),
       amount: data.amount || '',
       unit: data.unit
     }));

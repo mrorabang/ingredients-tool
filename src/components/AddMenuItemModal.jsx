@@ -24,16 +24,16 @@ const AddMenuItemModal = ({ isOpen, onClose, onSave }) => {
   }, [isOpen]);
 
   // Filter ingredients based on search
-  const filteredIngredients = ingredients.filter(ingredient =>
-    ingredient.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredIngredients = ingredients.filter(ingredient =>
+  //   ingredient.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   // Get selected ingredients list
   const selectedIngredientsList = Object.entries(selectedIngredients)
     .filter(([_, data]) => data) // Chỉ cần data tồn tại, không cần amount
     .map(([ingredientId, data]) => ({
       id: ingredientId,
-      ...ingredients.find(ing => ing.id == ingredientId),
+      ...ingredients.find(ing => ing.id === parseInt(ingredientId)),
       amount: data.amount || '',
       unit: data.unit
     }));

@@ -36,7 +36,7 @@ const RecipeViewModal = ({
           {recipe && Object.keys(recipe).length > 0 ? (
             <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
               {Object.keys(recipe).map(ingredientId => {
-                const ingredient = ingredients.find(ing => ing.id == ingredientId);
+                const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
                 const recipeData = recipe[ingredientId];
                 const amount = typeof recipeData === 'object' ? recipeData.amount : recipeData;
                 const unit = typeof recipeData === 'object' ? recipeData.unit : ingredient?.unit || '';
