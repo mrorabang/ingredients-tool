@@ -21,7 +21,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://mrorabang.github.io/nl",
+"homepage": "https://mrorabang.github.io/ingredients-tool",
   "eslintConfig": {
     "extends": [
       "react-app",
