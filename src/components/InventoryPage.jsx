@@ -1,39 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useData } from '../contexts/DataContext';
 import dataService from '../services/dataService';
 import Spinner from './Spinner';
 import MultiSelectGrid from './MultiSelectGrid';
 
 const InventoryPage = () => {
+  // Sử dụng DataContext thay vì load dữ liệu riêng
+  const { menuItems, ingredients, recipes, isLoading } = useData();
+  
   // State để lưu dữ liệu
-  const [menuItems, setMenuItems] = useState([]);
-  const [ingredients, setIngredients] = useState([]);
-  const [recipes, setRecipes] = useState({});
   const [salesCount, setSalesCount] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
-  const [isDataLoading, setIsDataLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItems, setSelectedItems] = useState({});
 
-  // Load dữ liệu khi component mount
-  useEffect(() => {
-    const loadData = async () => {
-      setIsDataLoading(true);
-      try {
-        if (!dataService.isInitialized) {
-          await dataService.init();
-        }
-        setMenuItems(dataService.getMenuItems());
-        setIngredients(dataService.getIngredients());
-        setRecipes(dataService.getAllRecipes());
-      } catch (error) {
-        console.error('Error loading data in InventoryPage:', error);
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-    
-    loadData();
-  }, []);
+  // Debug logging
+  console.log('InventoryPage render:');
+  console.log('- menuItems:', menuItems.length);
+  console.log('- ingredients:', ingredients.length);
+  console.log('- recipes:', Object.keys(recipes).length);
+  console.log('- isLoading:', isLoading);
+  console.log('- menuItems sample:', menuItems.slice(0, 3));
+  console.log('- recipes sample:', Object.keys(recipes).slice(0, 3));
 
   // Load dữ liệu bán hàng khi component mount
   useEffect(() => {
@@ -92,7 +80,7 @@ const InventoryPage = () => {
   const usedIngredients = calculateUsedIngredients();
 
   // Show spinner while loading data
-  if (isDataLoading) {
+  if (isLoading) {
     return (
       <div className="container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <Spinner text="Đang tải dữ liệu kho hàng..." />
@@ -140,49 +128,56 @@ const InventoryPage = () => {
       {/* Menu Items - MultiSelectGrid */}
       <div className="card fade-in" style={{ marginBottom: '3rem' }}>
         <h2 className="text-lg font-bold mb-3 text-center">🍹 Kiểm Kê Số Lượng Bán</h2>
-        <div style={{ padding: '1rem' }}>
-          <MultiSelectGrid
-            items={menuItems.map(item => ({ ...item, unit: 'ly' }))}
-            selectedItems={selectedItems}
-            onSelectionChange={(itemId, data) => {
-              setSelectedItems(prev => ({
-                ...prev,
-                [itemId]: data
-              }));
-              // Update sales count only if amount exists
-              if (data && data.amount) {
-                updateSalesCount(itemId, parseInt(data.amount) || 1);
-              }
-            }}
-            onAmountChange={(itemId, amount) => {
-              setSelectedItems(prev => ({
-                ...prev,
-                [itemId]: {
-                  ...prev[itemId],
-                  amount: amount
+        {menuItems.length === 0 ? (
+          <div className="text-center" style={{ padding: '2rem', color: '#666' }}>
+            <p>Không có món nào được tìm thấy.</p>
+            <p>Hãy kiểm tra kết nối dữ liệu hoặc tạo món mới.</p>
+          </div>
+        ) : (
+          <div style={{ padding: '1rem' }}>
+            <MultiSelectGrid
+              items={menuItems.map(item => ({ ...item, unit: 'ly' }))}
+              selectedItems={selectedItems}
+              onSelectionChange={(itemId, data) => {
+                setSelectedItems(prev => ({
+                  ...prev,
+                  [itemId]: data
+                }));
+                // Update sales count only if amount exists
+                if (data && data.amount) {
+                  updateSalesCount(itemId, parseInt(data.amount) || 1);
                 }
-              }));
-              // Update sales count
-              updateSalesCount(itemId, parseInt(amount) || 1);
-            }}
-            onRemove={(itemId) => {
-              setSelectedItems(prev => {
-                const newSelected = { ...prev };
-                delete newSelected[itemId];
-                return newSelected;
-              });
-              // Update sales count to 0
-              updateSalesCount(itemId, 0);
-            }}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            leftTitle="Danh Sách Món"
-            rightTitle="Số Lượng Đã Bán"
-            placeholder="Tìm kiếm món..."
-            showAmountInput={true}
-            showSearch={true}
-          />
-        </div>
+              }}
+              onAmountChange={(itemId, amount) => {
+                setSelectedItems(prev => ({
+                  ...prev,
+                  [itemId]: {
+                    ...prev[itemId],
+                    amount: amount
+                  }
+                }));
+                // Update sales count
+                updateSalesCount(itemId, parseInt(amount) || 1);
+              }}
+              onRemove={(itemId) => {
+                setSelectedItems(prev => {
+                  const newSelected = { ...prev };
+                  delete newSelected[itemId];
+                  return newSelected;
+                });
+                // Update sales count to 0
+                updateSalesCount(itemId, 0);
+              }}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              leftTitle="Danh Sách Món"
+              rightTitle="Số Lượng Đã Bán"
+              placeholder="Tìm kiếm món..."
+              showAmountInput={true}
+              showSearch={true}
+            />
+          </div>
+        )}
       </div>
 
       {/* Tổng kết nguyên liệu đã sử dụng */}

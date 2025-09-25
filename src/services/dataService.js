@@ -242,6 +242,33 @@ class DataService {
     return this.useMockAPI;
   }
 
+  // Lấy dữ liệu menu items mặc định
+  getDefaultMenuItems() {
+    return [
+      { "id": 1, "name": "Cà phê đen" },
+      { "id": 2, "name": "Cà phê sữa" },
+      { "id": 3, "name": "Sinh tố bơ" },
+      { "id": 4, "name": "Cacao sữa" },
+      { "id": 5, "name": "Bạc xiu" },
+      { "id": 6, "name": "Americano" },
+      { "id": 7, "name": "Sữa tươi cafe" },
+      { "id": 8, "name": "Cafe muối" },
+      { "id": 9, "name": "Cacao muối" },
+      { "id": 10, "name": "Cacao đá xay" },
+      { "id": 11, "name": "Cà phê đá xay" },
+      { "id": 12, "name": "Ép táo" },
+      { "id": 13, "name": "Ép cam" },
+      { "id": 14, "name": "Ép thơm" },
+      { "id": 15, "name": "Dừa tươi" },
+      { "id": 16, "name": "Sinh tố dừa" },
+      { "id": 17, "name": "Matcha sữa yến mạch" },
+      { "id": 18, "name": "Sữa chua đá" },
+      { "id": 19, "name": "Sữa chua việt quất" },
+      { "id": 20, "name": "Trà gừng" },
+      { "id": 21, "name": "Nước sấu" }
+    ];
+  }
+
   // Sync dữ liệu từ local lên MockAPI
   async syncToMockAPI() {
     if (!this.useMockAPI) {
@@ -294,60 +321,58 @@ class DataService {
     this.saveToLocalStorage();
   }
 
-  // Đọc dữ liệu từ API
+  // Đọc dữ liệu từ MockAPI
   async loadDataFromAPI() {
     try {
-      const baseURL = 'http://localhost:3001/api';
+      console.log('Bắt đầu load dữ liệu từ MockAPI...');
       
-      // Load menu items
-      const menuResponse = await fetch(`${baseURL}/menuItems`);
-      if (menuResponse.ok) {
-        this.menuItems = await menuResponse.json();
-      }
-
-      // Load ingredients - sử dụng MockAPI nếu được bật
+      // Load ingredients từ MockAPI
       if (this.useMockAPI) {
         try {
           this.ingredients = await mockAPIService.getAllIngredients();
-          console.log('Đã load ingredients từ MockAPI');
+          console.log('Đã load ingredients từ MockAPI:', this.ingredients.length, 'ingredients');
         } catch (mockAPIError) {
-          console.error('Lỗi khi load ingredients từ MockAPI, fallback to local API:', mockAPIError);
-          const ingredientsResponse = await fetch(`${baseURL}/ingredients`);
-          if (ingredientsResponse.ok) {
-            this.ingredients = await ingredientsResponse.json();
-          }
+          console.error('Lỗi khi load ingredients từ MockAPI:', mockAPIError);
+          throw mockAPIError;
         }
-      } else {
-        const ingredientsResponse = await fetch(`${baseURL}/ingredients`);
-        if (ingredientsResponse.ok) {
-          this.ingredients = await ingredientsResponse.json();
-        }
-      }
 
-      // Load recipes - sử dụng MockAPI nếu được bật
-      if (this.useMockAPI) {
+        // Load recipes từ MockAPI
         try {
           const mockAPIRecipes = await mockAPIService.getAllRecipes();
           this.recipes = mockAPIService.convertFromMockAPIFormat(mockAPIRecipes);
-          console.log('Đã load recipes từ MockAPI');
+          console.log('Đã load recipes từ MockAPI:', Object.keys(this.recipes).length, 'recipes');
         } catch (mockAPIError) {
-          console.error('Lỗi khi load recipes từ MockAPI, fallback to local API:', mockAPIError);
-          const recipesResponse = await fetch(`${baseURL}/recipes`);
-          if (recipesResponse.ok) {
-            this.recipes = await recipesResponse.json();
+          console.error('Lỗi khi load recipes từ MockAPI:', mockAPIError);
+          throw mockAPIError;
+        }
+      }
+
+      // Load menu items từ file JSON (fallback)
+      try {
+        const menuResponse = await fetch('/data/menuItems.json');
+        if (menuResponse.ok) {
+          const contentType = menuResponse.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            this.menuItems = await menuResponse.json();
+            console.log('Đã load menu items từ file JSON:', this.menuItems.length, 'menu items');
+          } else {
+            console.log('Response không phải JSON, sử dụng dữ liệu mặc định');
+            this.menuItems = this.getDefaultMenuItems();
           }
+        } else {
+          console.log('Không thể load menu items từ file, sử dụng dữ liệu mặc định');
+          this.menuItems = this.getDefaultMenuItems();
         }
-      } else {
-        const recipesResponse = await fetch(`${baseURL}/recipes`);
-        if (recipesResponse.ok) {
-          this.recipes = await recipesResponse.json();
-        }
+      } catch (error) {
+        console.error('Lỗi khi load menu items:', error);
+        console.log('Sử dụng dữ liệu mặc định cho menu items');
+        this.menuItems = this.getDefaultMenuItems();
       }
 
       // Load sales từ localStorage
       this.loadSalesFromLocalStorage();
     } catch (error) {
-      console.error('Lỗi khi load dữ liệu từ API:', error);
+      console.error('Lỗi khi load dữ liệu từ MockAPI:', error);
       // Fallback to file loading
       await this.loadDataFromFiles();
     }
@@ -357,9 +382,24 @@ class DataService {
   async loadDataFromFiles() {
     try {
       // Load menu items
-      const menuResponse = await fetch('/data/menuItems.json');
-      if (menuResponse.ok) {
-        this.menuItems = await menuResponse.json();
+      try {
+        const menuResponse = await fetch('/data/menuItems.json');
+        if (menuResponse.ok) {
+          const contentType = menuResponse.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            this.menuItems = await menuResponse.json();
+            console.log('Đã load menu items từ file JSON:', this.menuItems.length, 'menu items');
+          } else {
+            console.log('Response không phải JSON, sử dụng dữ liệu mặc định');
+            this.menuItems = this.getDefaultMenuItems();
+          }
+        } else {
+          console.log('Không thể load menu items từ file, sử dụng dữ liệu mặc định');
+          this.menuItems = this.getDefaultMenuItems();
+        }
+      } catch (error) {
+        console.error('Lỗi khi load menu items:', error);
+        this.menuItems = this.getDefaultMenuItems();
       }
 
       // Load ingredients
@@ -378,6 +418,8 @@ class DataService {
       this.loadSalesFromLocalStorage();
     } catch (error) {
       console.error('Lỗi khi load dữ liệu từ file:', error);
+      // Fallback to default data
+      this.menuItems = this.getDefaultMenuItems();
     }
   }
 
@@ -513,16 +555,20 @@ class DataService {
   // Khởi tạo service
   async init() {
     if (this.isInitialized) {
+      console.log('DataService đã được khởi tạo rồi');
       return; // Đã khởi tạo rồi
     }
     
+    console.log('Bắt đầu khởi tạo DataService, MockAPI mode:', this.useMockAPI);
+    
     if (this.useMockAPI) {
-      // Thử load từ API trước, nếu không được thì load từ file JSON, cuối cùng là localStorage
+      // Thử load từ MockAPI trước, nếu không được thì load từ file JSON, cuối cùng là localStorage
       try {
+        console.log('Đang thử load từ MockAPI...');
         await this.loadDataFromAPI();
         console.log('DataService initialized with MockAPI');
       } catch (error) {
-        console.log('Không thể load từ API, thử load từ file JSON:', error);
+        console.log('Không thể load từ MockAPI, thử load từ file JSON:', error);
         try {
           await this.loadDataFromFiles();
           console.log('DataService initialized with local files');
@@ -540,6 +586,7 @@ class DataService {
     }
     
     this.isInitialized = true;
+    console.log('DataService khởi tạo hoàn tất');
   }
 }
 

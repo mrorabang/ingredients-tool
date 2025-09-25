@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useData } from '../contexts/DataContext';
 import dataService from '../services/dataService';
 import RecipeEditModal from './RecipeEditModal';
 import RecipeViewModal from './RecipeViewModal';
@@ -7,39 +8,16 @@ import toastService from '../services/toastService';
 import Spinner from './Spinner';
 
 const RecipeManagementPage = () => {
+  // Sử dụng DataContext thay vì load dữ liệu riêng
+  const { menuItems, ingredients, recipes, isLoading, updateAllData } = useData();
+  
   // State để theo dõi món đang được xem chi tiết
-  const [menuItems, setMenuItems] = useState([]);
-  const [ingredients, setIngredients] = useState([]);
-  const [recipes, setRecipes] = useState({});
   const [viewingItem, setViewingItem] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-
-  // Load dữ liệu khi component mount
-  useEffect(() => {
-    const loadData = async () => {
-      setIsDataLoading(true);
-      try {
-        if (!dataService.isInitialized) {
-          await dataService.init();
-        }
-        setMenuItems(dataService.getMenuItems());
-        setIngredients(dataService.getIngredients());
-        setRecipes(dataService.getAllRecipes());
-        console.log('RecipeManagementPage loaded data');
-      } catch (error) {
-        console.error('Error loading data in RecipeManagementPage:', error);
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-    
-    loadData();
-  }, []);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Hàm xem công thức
   const startViewing = (itemId) => {
@@ -56,13 +34,11 @@ const RecipeManagementPage = () => {
 
   // Hàm lưu công thức từ modal
   const handleSaveRecipe = async (newRecipe) => {
-    setIsLoading(true);
+    setIsSaving(true);
     try {
       await dataService.updateRecipe(editingItem, newRecipe);
       // Refresh data after saving
-      setMenuItems(dataService.getMenuItems());
-      setIngredients(dataService.getIngredients());
-      setRecipes(dataService.getAllRecipes());
+      updateAllData();
       setEditingItem(null);
       setIsEditModalOpen(false);
       toastService.success('Đã lưu công thức thành công!');
@@ -70,7 +46,7 @@ const RecipeManagementPage = () => {
       console.error('Lỗi khi lưu công thức:', error);
       toastService.error('Có lỗi xảy ra khi lưu công thức!');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -100,13 +76,20 @@ const RecipeManagementPage = () => {
   // Hàm xử lý sau khi tạo món mới thành công
   const handleAddSuccess = async () => {
     // Refresh data
-    setMenuItems(dataService.getMenuItems());
-    setIngredients(dataService.getIngredients());
-    setRecipes(dataService.getAllRecipes());
+    updateAllData();
   };
 
+  // Debug logging
+  console.log('RecipeManagementPage render:');
+  console.log('- menuItems:', menuItems.length);
+  console.log('- ingredients:', ingredients.length);
+  console.log('- recipes:', Object.keys(recipes).length);
+  console.log('- isLoading:', isLoading);
+  console.log('- menuItems sample:', menuItems.slice(0, 3));
+  console.log('- recipes sample:', Object.keys(recipes).slice(0, 3));
+
   // Show spinner while loading data
-  if (isDataLoading) {
+  if (isLoading) {
     return (
       <div className="container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <Spinner text="Đang tải dữ liệu công thức..." />
@@ -152,8 +135,14 @@ const RecipeManagementPage = () => {
       {/* Danh sách món */}
       <div className="card fade-in" style={{ marginBottom: '3rem' }}>
         <h2 className="text-lg font-bold mb-3 text-center">🍹 Danh Sách Món</h2>
-        <div className="grid grid-2" style={{ gap: '1rem' }}>
-          {menuItems.map(item => (
+        {menuItems.length === 0 ? (
+          <div className="text-center" style={{ padding: '2rem', color: '#666' }}>
+            <p>Không có món nào được tìm thấy.</p>
+            <p>Hãy thử tạo món mới hoặc kiểm tra kết nối dữ liệu.</p>
+          </div>
+        ) : (
+          <div className="grid grid-2" style={{ gap: '1rem' }}>
+            {menuItems.map(item => (
             <div key={item.id} className="card" style={{
               padding: '1rem',
               backgroundColor: viewingItem === item.id ? '#e3f2fd' : '#f8f9fa',
@@ -188,8 +177,9 @@ const RecipeManagementPage = () => {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
 
