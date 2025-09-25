@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# Ingredients Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ứng dụng quản lý nguyên liệu và công thức nấu ăn.
 
-## Available Scripts
+## Tính năng
 
-In the project directory, you can run:
+- 📋 Quản lý nguyên liệu
+- 🍽️ Quản lý món ăn và công thức
+- 📊 Kiểm kê số lượng bán
+- ➕ Tạo món mới
+- ✏️ Chỉnh sửa công thức
+- 🔍 Tìm kiếm nguyên liệu
 
-### `npm start`
+## Cài đặt
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+npm install
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Chạy ứng dụng
 
-### `npm test`
+```bash
+npm start
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Deploy lên GitHub Pages
 
-### `npm run build`
+### Bước 1: Cập nhật package.json
+Thay đổi `homepage` trong package.json:
+```json
+"homepage": "https://YOUR_USERNAME.github.io/ingredients-tool"
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Bước 2: Tạo repository trên GitHub
+1. Tạo repository mới với tên `ingredients-tool`
+2. Copy URL của repository
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Bước 3: Khởi tạo Git
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/ingredients-tool.git
+git push -u origin main
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Bước 4: Deploy
+```bash
+npm run deploy
+```
 
-### `npm run eject`
+### Bước 5: Cấu hình GitHub Pages
+1. Vào Settings của repository
+2. Scroll xuống phần "Pages"
+3. Chọn source: "Deploy from a branch"
+4. Chọn branch: "gh-pages"
+5. Chọn folder: "/ (root)"
+6. Click "Save"
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Truy cập ứng dụng
+Sau khi deploy thành công, ứng dụng sẽ có sẵn tại:
+`https://YOUR_USERNAME.github.io/ingredients-tool`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Cập nhật ứng dụng
+Mỗi khi có thay đổi, chạy:
+```bash
+npm run deploy
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Cấu trúc project
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+tool/
+├── public/
+│   ├── data/
+│   │   ├── ingredients.json
+│   │   ├── menuItems.json
+│   │   └── recipes.json
+│   └── index.html
+├── src/
+│   ├── components/
+│   │   ├── AddMenuItemModal.jsx
+│   │   ├── IngredientsPage.jsx
+│   │   ├── InventoryPage.jsx
+│   │   ├── Modal.jsx
+│   │   ├── MultiSelectGrid.jsx
+│   │   ├── RecipeEditModal.jsx
+│   │   ├── RecipeManagementPage.jsx
+│   │   └── RecipeViewModal.jsx
+│   ├── services/
+│   │   ├── dataService.js
+│   │   ├── mockAPIService.js
+│   │   └── toastService.js
+│   └── App.js
+└── package.json
+```
 
-## Learn More
+## Công nghệ sử dụng
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- React 19
+- React Router DOM
+- MockAPI
+- GitHub Pages

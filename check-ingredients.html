@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check All Ingredients</title>
+</head>
+<body>
+    <h1>Check All Ingredients</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function checkAllIngredients() {
+            try {
+                // Check MockAPI
+                console.log('Checking MockAPI...');
+                const mockAPIResponse = await fetch('https://68d4a223214be68f8c69d69b.mockapi.io/ingredients');
+                const mockAPIIngredients = await mockAPIResponse.json();
+                
+                // Check local data
+                console.log('Checking local data...');
+                const localResponse = await fetch('/data/ingredients.json');
+                const localIngredients = await localResponse.json();
+                
+                let html = '<h2>MockAPI Ingredients (' + mockAPIIngredients.length + '):</h2>';
+                html += '<ul>';
+                mockAPIIngredients.forEach(ing => {
+                    html += `<li>ID: ${ing.id}, Name: "${ing.name}", Unit: ${ing.unit}</li>`;
+                });
+                html += '</ul>';
+                
+                html += '<h2>Local Ingredients (' + localIngredients.length + '):</h2>';
+                html += '<ul>';
+                localIngredients.forEach(ing => {
+                    html += `<li>ID: ${ing.id}, Name: "${ing.name}", Unit: ${ing.unit}</li>`;
+                });
+                html += '</ul>';
+                
+                // Find ingredients with "ổi" or "hồng"
+                const mockAPIFiltered = mockAPIIngredients.filter(ing => 
+                    ing.name.toLowerCase().includes('ổi') || 
+                    ing.name.toLowerCase().includes('hồng') ||
+                    ing.name.includes('Ổi') ||
+                    ing.name.includes('Hồng')
+                );
+                
+                const localFiltered = localIngredients.filter(ing => 
+                    ing.name.toLowerCase().includes('ổi') || 
+                    ing.name.toLowerCase().includes('hồng') ||
+                    ing.name.includes('Ổi') ||
+                    ing.name.includes('Hồng')
+                );
+                
+                html += '<h2>Ingredients with "ổi" or "hồng":</h2>';
+                html += '<h3>MockAPI:</h3><ul>';
+                mockAPIFiltered.forEach(ing => {
+                    html += `<li>ID: ${ing.id}, Name: "${ing.name}"</li>`;
+                });
+                html += '</ul>';
+                
+                html += '<h3>Local:</h3><ul>';
+                localFiltered.forEach(ing => {
+                    html += `<li>ID: ${ing.id}, Name: "${ing.name}"</li>`;
+                });
+                html += '</ul>';
+                
+                document.getElementById('result').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        checkAllIngredients();
+    </script>
+</body>
+</html>
