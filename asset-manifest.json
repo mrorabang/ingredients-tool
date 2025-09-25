@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ingredients-tool/static/css/main.ea05ec11.css",
+    "main.js": "/ingredients-tool/static/js/main.8eee1d4f.js",
+    "static/js/453.5b07557f.chunk.js": "/ingredients-tool/static/js/453.5b07557f.chunk.js",
+    "index.html": "/ingredients-tool/index.html",
+    "main.ea05ec11.css.map": "/ingredients-tool/static/css/main.ea05ec11.css.map",
+    "main.8eee1d4f.js.map": "/ingredients-tool/static/js/main.8eee1d4f.js.map",
+    "453.5b07557f.chunk.js.map": "/ingredients-tool/static/js/453.5b07557f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ea05ec11.css",
+    "static/js/main.8eee1d4f.js"
+  ]
+}
