@@ -36,7 +36,12 @@ const RecipeViewModal = ({
           {recipe && Object.keys(recipe).length > 0 ? (
             <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
               {Object.keys(recipe).map(ingredientId => {
-                const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
+                // Tìm ingredient theo id hoặc ingredientId (so sánh string với string)
+                const ingredient = ingredients.find(ing => 
+                  ing.id === ingredientId || 
+                  ing.id === parseInt(ingredientId).toString() ||
+                  ing.ingredientId === parseInt(ingredientId)
+                );
                 const recipeData = recipe[ingredientId];
                 const amount = typeof recipeData === 'object' ? recipeData.amount : recipeData;
                 const unit = typeof recipeData === 'object' ? recipeData.unit : ingredient?.unit || '';
@@ -53,7 +58,7 @@ const RecipeViewModal = ({
                   }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="font-semibold text-xs" style={{ color: '#333' }}>
-                        {ingredient?.name || 'Unknown'}
+                        {ingredient?.name || `Ingredient ${ingredientId}`}
                       </div>
                     </div>
                     <div className="text-lg font-bold text-primary">

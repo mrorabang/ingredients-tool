@@ -22,9 +22,7 @@ const IngredientsPage = () => {
           await dataService.init();
         }
         setIngredients(dataService.getIngredients());
-        console.log('Loaded ingredients:', dataService.getIngredients().length);
       } catch (error) {
-        console.error('Error loading ingredients:', error);
         setIngredients([]);
       } finally {
         setIsDataLoading(false);
@@ -94,7 +92,6 @@ const IngredientsPage = () => {
         setIngredients(dataService.getIngredients());
         toastService.success('Đã xóa nguyên liệu thành công!');
       } catch (error) {
-        console.error('Lỗi khi xóa nguyên liệu:', error);
         toastService.error('Có lỗi xảy ra khi xóa nguyên liệu!');
       }
     }

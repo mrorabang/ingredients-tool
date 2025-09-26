@@ -87,7 +87,6 @@ export const loadFromLocalStorage = (key) => {
     const parsed = JSON.parse(stored);
     return parsed.data || parsed; // Support both old and new format
   } catch (error) {
-    console.error('Lỗi khi load từ localStorage:', error);
     return null;
   }
 };

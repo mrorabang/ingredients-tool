@@ -1,4 +1,5 @@
 import mockAPIService from './mockAPIService';
+import toastService from './toastService';
 
 // Service để quản lý dữ liệu - Đọc/ghi từ file JSON và MockAPI
 class DataService {
@@ -36,26 +37,37 @@ class DataService {
   async updateRecipe(itemId, recipe) {
     this.recipes[itemId] = recipe;
     
+    
     if (this.useMockAPI) {
       try {
         const menuItem = this.menuItems.find(item => item.id === itemId);
         const mockAPIRecipe = mockAPIService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
         
-        // Kiểm tra xem recipe đã tồn tại trong MockAPI chưa
+        // Debug: Kiểm tra tất cả recipes trước
         try {
-          await mockAPIService.getRecipeById(itemId);
+          await mockAPIService.debugGetAllRecipes();
+        } catch (debugError) {
+        }
+        
+        // Debug: Kiểm tra recipe cụ thể
+        try {
+          await mockAPIService.debugGetRecipeById(itemId);
+        } catch (debugError) {
+        }
+        
+        // Kiểm tra xem recipe đã tồn tại trong MockAPI chưa
+        const recipeExists = await mockAPIService.checkRecipeExists(itemId);
+        
+        if (recipeExists) {
           // Recipe đã tồn tại, cập nhật
           await mockAPIService.updateRecipe(itemId, mockAPIRecipe);
-        } catch (error) {
+        } else {
           // Recipe chưa tồn tại, tạo mới
           await mockAPIService.createRecipe(mockAPIRecipe);
         }
-        
-        console.log('Đã cập nhật recipe trong MockAPI');
       } catch (error) {
-        console.error('Lỗi khi cập nhật recipe trong MockAPI:', error);
-        // Fallback to local storage
-        await this.saveRecipesToAPI();
+        toastService.error('Lỗi khi cập nhật công thức trong MockAPI');
+        throw error;
       }
     } else {
       await this.saveRecipesToAPI();
@@ -67,7 +79,12 @@ class DataService {
     const newId = Math.max(...this.menuItems.map(i => i.id), 0) + 1;
     const newItem = { ...item, id: newId };
     this.menuItems.push(newItem);
-    await this.saveMenuItemsToAPI();
+    
+    if (this.useMockAPI) {
+      // Chỉ lưu vào MockAPI, không fallback local
+    } else {
+      await this.saveMenuItemsToAPI();
+    }
     return newItem;
   }
 
@@ -76,7 +93,12 @@ class DataService {
     const index = this.menuItems.findIndex(item => item.id === itemId);
     if (index !== -1) {
       this.menuItems[index] = { ...this.menuItems[index], ...updates };
-      await this.saveMenuItemsToAPI();
+      
+      if (this.useMockAPI) {
+        // Chỉ lưu vào MockAPI, không fallback local
+      } else {
+        await this.saveMenuItemsToAPI();
+      }
     }
   }
 
@@ -84,8 +106,19 @@ class DataService {
   async deleteMenuItem(itemId) {
     this.menuItems = this.menuItems.filter(item => item.id !== itemId);
     delete this.recipes[itemId];
-    await this.saveMenuItemsToAPI();
-    await this.saveRecipesToAPI();
+    
+    if (this.useMockAPI) {
+      // Xóa recipe khỏi MockAPI nếu có
+      try {
+        await mockAPIService.deleteRecipe(itemId);
+      } catch (error) {
+        toastService.error('Lỗi khi xóa công thức khỏi MockAPI');
+        throw error;
+      }
+    } else {
+      await this.saveMenuItemsToAPI();
+      await this.saveRecipesToAPI();
+    }
   }
 
   // Thêm nguyên liệu mới
@@ -94,16 +127,10 @@ class DataService {
       try {
         const newIngredient = await mockAPIService.createIngredient(ingredient);
         this.ingredients.push(newIngredient);
-        console.log('Đã tạo ingredient mới trong MockAPI');
         return newIngredient;
       } catch (error) {
-        console.error('Lỗi khi tạo ingredient trong MockAPI:', error);
-        // Fallback to local
-        const newId = Math.max(...this.ingredients.map(i => i.id), 0) + 1;
-        const newIngredient = { ...ingredient, id: newId };
-        this.ingredients.push(newIngredient);
-        await this.saveIngredientsToAPI();
-        return newIngredient;
+        toastService.error('Lỗi khi tạo nguyên liệu trong MockAPI');
+        throw error;
       }
     } else {
       const newId = Math.max(...this.ingredients.map(i => i.id), 0) + 1;
@@ -122,11 +149,18 @@ class DataService {
       
       if (this.useMockAPI) {
         try {
-          await mockAPIService.updateIngredient(ingredientId, this.ingredients[index]);
-          console.log('Đã cập nhật ingredient trong MockAPI');
+          const ingredientExists = await mockAPIService.checkIngredientExists(ingredientId);
+          
+          if (ingredientExists) {
+            // Ingredient đã tồn tại, cập nhật
+            await mockAPIService.updateIngredient(ingredientId, this.ingredients[index]);
+          } else {
+            // Ingredient chưa tồn tại, tạo mới
+            await mockAPIService.createIngredient(this.ingredients[index]);
+          }
         } catch (error) {
-          console.error('Lỗi khi cập nhật ingredient trong MockAPI:', error);
-          await this.saveIngredientsToAPI();
+          toastService.error('Lỗi khi cập nhật nguyên liệu trong MockAPI');
+          throw error;
         }
       } else {
         await this.saveIngredientsToAPI();
@@ -136,20 +170,15 @@ class DataService {
 
   // Xóa nguyên liệu
   async deleteIngredient(ingredientId) {
-    console.log('Attempting to delete ingredient with ID:', ingredientId);
-    console.log('Current ingredients before delete:', this.ingredients.length);
     
     // Tìm ingredient trước khi xóa để debug
     const ingredientToDelete = this.ingredients.find(ing => ing.id === ingredientId);
     if (ingredientToDelete) {
-      console.log('Found ingredient to delete:', ingredientToDelete);
     } else {
-      console.log('Ingredient not found in local data, ID:', ingredientId);
     }
     
     // Xóa nguyên liệu khỏi local data
     this.ingredients = this.ingredients.filter(ing => ing.id !== ingredientId);
-    console.log('Ingredients after local delete:', this.ingredients.length);
     
     // Xóa nguyên liệu khỏi tất cả công thức
     const updatedRecipes = {};
@@ -163,30 +192,17 @@ class DataService {
     if (this.useMockAPI) {
       try {
         // Xóa ingredient trong MockAPI
-        console.log('Deleting ingredient from MockAPI with ID:', ingredientId);
         await mockAPIService.deleteIngredient(ingredientId);
-        console.log('Đã xóa ingredient trong MockAPI');
         
         // Cập nhật tất cả recipes trong MockAPI
         const updatePromises = Object.keys(this.recipes).map(itemId => 
           this.updateRecipe(itemId, this.recipes[itemId])
         );
         await Promise.all(updatePromises);
-        console.log('Đã cập nhật tất cả recipes sau khi xóa ingredient');
         
       } catch (error) {
-        console.error('Lỗi khi xóa ingredient trong MockAPI:', error);
-        
-        // Nếu là lỗi 404 (ingredient không tồn tại trong MockAPI), chỉ cần sync local data
-        if (error.message.includes('404')) {
-          console.log('Ingredient không tồn tại trong MockAPI, chỉ cần sync local data');
-          await this.saveIngredientsToAPI();
-          await this.saveRecipesToAPI();
-        } else {
-          // Lỗi khác, fallback to local storage
-          await this.saveIngredientsToAPI();
-          await this.saveRecipesToAPI();
-        }
+        toastService.error('Lỗi khi xóa nguyên liệu trong MockAPI');
+        throw error;
       }
     } else {
       await this.saveIngredientsToAPI();
@@ -203,10 +219,9 @@ class DataService {
         const menuItem = this.menuItems.find(item => item.id === itemId);
         const mockAPIRecipe = mockAPIService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
         await mockAPIService.createRecipe(mockAPIRecipe);
-        console.log('Đã tạo recipe mới trong MockAPI');
       } catch (error) {
-        console.error('Lỗi khi tạo recipe trong MockAPI:', error);
-        await this.saveRecipesToAPI();
+        toastService.error('Lỗi khi tạo công thức trong MockAPI');
+        throw error;
       }
     } else {
       await this.saveRecipesToAPI();
@@ -220,10 +235,9 @@ class DataService {
     if (this.useMockAPI) {
       try {
         await mockAPIService.deleteRecipe(itemId);
-        console.log('Đã xóa recipe trong MockAPI');
       } catch (error) {
-        console.error('Lỗi khi xóa recipe trong MockAPI:', error);
-        await this.saveRecipesToAPI();
+        toastService.error('Lỗi khi xóa công thức trong MockAPI');
+        throw error;
       }
     } else {
       await this.saveRecipesToAPI();
@@ -233,13 +247,26 @@ class DataService {
   // Toggle MockAPI mode
   toggleMockAPIMode() {
     this.useMockAPI = !this.useMockAPI;
-    console.log('MockAPI mode:', this.useMockAPI ? 'ON' : 'OFF');
     return this.useMockAPI;
   }
 
   // Lấy trạng thái MockAPI
   isMockAPIEnabled() {
     return this.useMockAPI;
+  }
+
+  // Kiểm tra trạng thái MockAPI
+  checkMockAPIStatus() {
+    const status = {
+      mockAPI: {
+        enabled: this.useMockAPI,
+        ingredients: this.ingredients.length,
+        recipes: Object.keys(this.recipes).length,
+        menuItems: this.menuItems.length
+      }
+    };
+    
+    return status;
   }
 
   // Lấy dữ liệu menu items mặc định
@@ -272,24 +299,19 @@ class DataService {
   // Sync dữ liệu từ local lên MockAPI
   async syncToMockAPI() {
     if (!this.useMockAPI) {
-      console.log('MockAPI không được bật, không thể sync');
       return;
     }
 
     try {
-      console.log('Bắt đầu sync dữ liệu lên MockAPI...');
       
       // Sync ingredients
       for (const ingredient of this.ingredients) {
         try {
           await mockAPIService.createIngredient(ingredient);
-          console.log('Đã sync ingredient:', ingredient.name);
         } catch (error) {
           if (error.message.includes('409')) {
             // Ingredient đã tồn tại, bỏ qua
-            console.log('Ingredient đã tồn tại:', ingredient.name);
           } else {
-            console.error('Lỗi khi sync ingredient:', ingredient.name, error);
           }
         }
       }
@@ -298,15 +320,11 @@ class DataService {
       for (const [itemId, recipe] of Object.entries(this.recipes)) {
         try {
           await this.updateRecipe(itemId, recipe);
-          console.log('Đã sync recipe cho item:', itemId);
         } catch (error) {
-          console.error('Lỗi khi sync recipe cho item:', itemId, error);
         }
       }
       
-      console.log('Hoàn thành sync dữ liệu lên MockAPI');
     } catch (error) {
-      console.error('Lỗi khi sync dữ liệu lên MockAPI:', error);
     }
   }
 
@@ -318,188 +336,45 @@ class DataService {
   // Cập nhật dữ liệu bán hàng
   updateSales(date, salesData) {
     this.sales[date] = salesData;
-    this.saveToLocalStorage();
+    this.saveSalesToLocalStorage();
   }
 
   // Đọc dữ liệu từ MockAPI
   async loadDataFromAPI() {
+    if (!this.useMockAPI) {
+      throw new Error('MockAPI không được bật');
+    }
+
     try {
-      console.log('Bắt đầu load dữ liệu từ MockAPI...');
       
       // Load ingredients từ MockAPI
-      if (this.useMockAPI) {
-        try {
-          this.ingredients = await mockAPIService.getAllIngredients();
-          console.log('Đã load ingredients từ MockAPI:', this.ingredients.length, 'ingredients');
-        } catch (mockAPIError) {
-          console.error('Lỗi khi load ingredients từ MockAPI:', mockAPIError);
-          throw mockAPIError;
-        }
+      this.ingredients = await mockAPIService.getAllIngredients();
 
-        // Load recipes từ MockAPI
-        try {
-          const mockAPIRecipes = await mockAPIService.getAllRecipes();
-          this.recipes = mockAPIService.convertFromMockAPIFormat(mockAPIRecipes);
-          console.log('Đã load recipes từ MockAPI:', Object.keys(this.recipes).length, 'recipes');
-        } catch (mockAPIError) {
-          console.error('Lỗi khi load recipes từ MockAPI:', mockAPIError);
-          throw mockAPIError;
-        }
-      }
+      // Load recipes từ MockAPI
+      const mockAPIRecipes = await mockAPIService.getAllRecipes();
+      this.recipes = mockAPIService.convertFromMockAPIFormat(mockAPIRecipes);
 
-      // Load menu items từ file JSON (fallback)
-      try {
-        const menuResponse = await fetch('/data/menuItems.json');
-        if (menuResponse.ok) {
-          const contentType = menuResponse.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            this.menuItems = await menuResponse.json();
-            console.log('Đã load menu items từ file JSON:', this.menuItems.length, 'menu items');
-          } else {
-            console.log('Response không phải JSON, sử dụng dữ liệu mặc định');
-            this.menuItems = this.getDefaultMenuItems();
-          }
-        } else {
-          console.log('Không thể load menu items từ file, sử dụng dữ liệu mặc định');
-          this.menuItems = this.getDefaultMenuItems();
-        }
-      } catch (error) {
-        console.error('Lỗi khi load menu items:', error);
-        console.log('Sử dụng dữ liệu mặc định cho menu items');
-        this.menuItems = this.getDefaultMenuItems();
-      }
-
-      // Load sales từ localStorage
-      this.loadSalesFromLocalStorage();
-    } catch (error) {
-      console.error('Lỗi khi load dữ liệu từ MockAPI:', error);
-      // Fallback to file loading
-      await this.loadDataFromFiles();
-    }
-  }
-
-  // Đọc dữ liệu từ file JSON (fallback)
-  async loadDataFromFiles() {
-    try {
-      // Load menu items
-      try {
-        const menuResponse = await fetch('/data/menuItems.json');
-        if (menuResponse.ok) {
-          const contentType = menuResponse.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            this.menuItems = await menuResponse.json();
-            console.log('Đã load menu items từ file JSON:', this.menuItems.length, 'menu items');
-          } else {
-            console.log('Response không phải JSON, sử dụng dữ liệu mặc định');
-            this.menuItems = this.getDefaultMenuItems();
-          }
-        } else {
-          console.log('Không thể load menu items từ file, sử dụng dữ liệu mặc định');
-          this.menuItems = this.getDefaultMenuItems();
-        }
-      } catch (error) {
-        console.error('Lỗi khi load menu items:', error);
-        this.menuItems = this.getDefaultMenuItems();
-      }
-
-      // Load ingredients
-      const ingredientsResponse = await fetch('/data/ingredients.json');
-      if (ingredientsResponse.ok) {
-        this.ingredients = await ingredientsResponse.json();
-      }
-
-      // Load recipes
-      const recipesResponse = await fetch('/data/recipes.json');
-      if (recipesResponse.ok) {
-        this.recipes = await recipesResponse.json();
-      }
-
-      // Load sales từ localStorage
-      this.loadSalesFromLocalStorage();
-    } catch (error) {
-      console.error('Lỗi khi load dữ liệu từ file:', error);
-      // Fallback to default data
+      // Load menu items từ MockAPI (tạo từ recipes)
       this.menuItems = this.getDefaultMenuItems();
+
+      // Load sales từ localStorage
+      this.loadSalesFromLocalStorage();
+      
+    } catch (error) {
+      toastService.error('Không thể kết nối đến MockAPI. Vui lòng kiểm tra kết nối mạng.');
+      throw error;
     }
   }
 
-  // Lưu menu items vào API
-  async saveMenuItemsToAPI() {
-    try {
-      const response = await fetch('http://localhost:3001/api/menuItems', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(this.menuItems)
-      });
-      
-      if (response.ok) {
-        console.log('Đã lưu menuItems vào file JSON');
-        // Lưu vào localStorage như backup
-        localStorage.setItem('ingredientsTool_menuItems', JSON.stringify(this.menuItems));
-      } else {
-        throw new Error('Không thể lưu menuItems');
-      }
-    } catch (error) {
-      console.error('Lỗi khi lưu menuItems:', error);
-      // Fallback to localStorage
-      localStorage.setItem('ingredientsTool_menuItems', JSON.stringify(this.menuItems));
-    }
-  }
 
-  // Lưu ingredients vào API
-  async saveIngredientsToAPI() {
-    try {
-      const response = await fetch('http://localhost:3001/api/ingredients', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(this.ingredients)
-      });
-      
-      if (response.ok) {
-        console.log('Đã lưu ingredients vào file JSON');
-        localStorage.setItem('ingredientsTool_ingredients', JSON.stringify(this.ingredients));
-      } else {
-        throw new Error('Không thể lưu ingredients');
-      }
-    } catch (error) {
-      console.error('Lỗi khi lưu ingredients:', error);
-      localStorage.setItem('ingredientsTool_ingredients', JSON.stringify(this.ingredients));
-    }
-  }
 
-  // Lưu recipes vào API
-  async saveRecipesToAPI() {
-    try {
-      const response = await fetch('http://localhost:3001/api/recipes', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(this.recipes)
-      });
-      
-      if (response.ok) {
-        console.log('Đã lưu recipes vào file JSON');
-        localStorage.setItem('ingredientsTool_recipes', JSON.stringify(this.recipes));
-      } else {
-        throw new Error('Không thể lưu recipes');
-      }
-    } catch (error) {
-      console.error('Lỗi khi lưu recipes:', error);
-      localStorage.setItem('ingredientsTool_recipes', JSON.stringify(this.recipes));
-    }
-  }
+
 
   // Lưu sales vào localStorage
   saveSalesToLocalStorage() {
     try {
       localStorage.setItem('ingredientsTool_sales', JSON.stringify(this.sales));
     } catch (error) {
-      console.error('Lỗi khi lưu dữ liệu sales:', error);
     }
   }
 
@@ -511,82 +386,32 @@ class DataService {
         this.sales = JSON.parse(savedSales);
       }
     } catch (error) {
-      console.error('Lỗi khi load dữ liệu sales:', error);
     }
   }
 
-  // Lưu vào localStorage (backup)
-  saveToLocalStorage() {
-    try {
-      localStorage.setItem('ingredientsTool_menuItems', JSON.stringify(this.menuItems));
-      localStorage.setItem('ingredientsTool_ingredients', JSON.stringify(this.ingredients));
-      localStorage.setItem('ingredientsTool_recipes', JSON.stringify(this.recipes));
-      this.saveSalesToLocalStorage();
-    } catch (error) {
-      console.error('Lỗi khi lưu vào localStorage:', error);
-    }
-  }
 
-  // Load từ localStorage (backup)
-  loadFromLocalStorage() {
-    try {
-      const savedMenuItems = localStorage.getItem('ingredientsTool_menuItems');
-      const savedIngredients = localStorage.getItem('ingredientsTool_ingredients');
-      const savedRecipes = localStorage.getItem('ingredientsTool_recipes');
-      
-      if (savedMenuItems) {
-        this.menuItems = JSON.parse(savedMenuItems);
-      }
-      
-      if (savedIngredients) {
-        this.ingredients = JSON.parse(savedIngredients);
-      }
-      
-      if (savedRecipes) {
-        this.recipes = JSON.parse(savedRecipes);
-      }
-      
-      this.loadSalesFromLocalStorage();
-    } catch (error) {
-      console.error('Lỗi khi load dữ liệu từ localStorage:', error);
-    }
-  }
 
   // Khởi tạo service
   async init() {
     if (this.isInitialized) {
-      console.log('DataService đã được khởi tạo rồi');
       return; // Đã khởi tạo rồi
     }
     
-    console.log('Bắt đầu khởi tạo DataService, MockAPI mode:', this.useMockAPI);
-    
     if (this.useMockAPI) {
-      // Thử load từ MockAPI trước, nếu không được thì load từ file JSON, cuối cùng là localStorage
+      // Chỉ load từ MockAPI
       try {
-        console.log('Đang thử load từ MockAPI...');
         await this.loadDataFromAPI();
-        console.log('DataService initialized with MockAPI');
       } catch (error) {
-        console.log('Không thể load từ MockAPI, thử load từ file JSON:', error);
-        try {
-          await this.loadDataFromFiles();
-          console.log('DataService initialized with local files');
-        } catch (fileError) {
-          console.log('Không thể load từ file JSON, sử dụng localStorage:', fileError);
-          this.loadFromLocalStorage();
-          console.log('DataService initialized with localStorage');
-        }
+        toastService.error('Không thể kết nối đến MockAPI. Vui lòng kiểm tra kết nối mạng.');
+        throw error;
       }
     } else {
-      // Chỉ sử dụng localStorage khi MockAPI bị tắt
-      console.log('MockAPI bị tắt, sử dụng localStorage');
-      this.loadFromLocalStorage();
-      console.log('DataService initialized with localStorage');
+      // MockAPI bị tắt - không hỗ trợ
+      toastService.error('MockAPI phải được bật để sử dụng ứng dụng');
+      throw new Error('MockAPI phải được bật');
     }
     
     this.isInitialized = true;
-    console.log('DataService khởi tạo hoàn tất');
   }
 }
 

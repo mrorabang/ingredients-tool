@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import dataService from '../services/dataService';
+import excelService from '../services/excelService';
+import toastService from '../services/toastService';
 import Spinner from './Spinner';
 import MultiSelectGrid from './MultiSelectGrid';
 
@@ -13,15 +15,28 @@ const InventoryPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItems, setSelectedItems] = useState({});
+  const [isExporting, setIsExporting] = useState(false);
 
-  // Debug logging
-  console.log('InventoryPage render:');
-  console.log('- menuItems:', menuItems.length);
-  console.log('- ingredients:', ingredients.length);
-  console.log('- recipes:', Object.keys(recipes).length);
-  console.log('- isLoading:', isLoading);
-  console.log('- menuItems sample:', menuItems.slice(0, 3));
-  console.log('- recipes sample:', Object.keys(recipes).slice(0, 3));
+
+  // Function xuất Excel theo thứ tự cố định
+  const handleExportSimple = () => {
+    setIsExporting(true);
+    try {
+      // Tính tổng nguyên liệu đã sử dụng
+      const usedIngredients = calculateUsedIngredients();
+      const result = excelService.exportSimpleInventory(usedIngredients, ingredients);
+      
+      if (result.success) {
+        toastService.success(result.message);
+      } else {
+        toastService.error(result.message);
+      }
+    } catch (error) {
+      toastService.error('Có lỗi xảy ra khi xuất file Excel!');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Load dữ liệu bán hàng khi component mount
   useEffect(() => {
@@ -124,6 +139,7 @@ const InventoryPage = () => {
           />
         </div>
       </div>
+
       
       {/* Menu Items - MultiSelectGrid */}
       <div className="card fade-in" style={{ marginBottom: '3rem' }}>
@@ -182,11 +198,34 @@ const InventoryPage = () => {
 
       {/* Tổng kết nguyên liệu đã sử dụng */}
       <div className="card fade-in" style={{ marginBottom: '2rem' }}>
-        <h2 className="text-lg font-bold mb-3 text-center">📦 Tổng Nguyên Liệu Đã Sử Dụng</h2>
+        <div className="card-header">
+          <h2 className="text-lg font-bold mb-0">📦 Tổng Nguyên Liệu Đã Sử Dụng</h2>
+          <button
+            className="btn btn-success"
+            onClick={handleExportSimple}
+            disabled={isExporting}
+            style={{ 
+              padding: '0.5rem 1rem',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              whiteSpace: 'nowrap',
+              minWidth: 'fit-content'
+            }}
+          >
+            {isExporting ? '⏳' : '📊'} Tải xuống Excel
+          </button>
+        </div>
         {Object.keys(usedIngredients).length > 0 ? (
           <div className="grid grid-3" style={{ gap: '1rem' }}>
             {Object.keys(usedIngredients).map(ingredientId => {
-              const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
+              // Tìm ingredient theo id (so sánh string với string)
+              const ingredient = ingredients.find(ing => 
+                ing.id === ingredientId || 
+                ing.id === parseInt(ingredientId).toString() ||
+                ing.ingredientId === parseInt(ingredientId)
+              );
               return (
                 <div key={ingredientId} className="card" style={{
                   padding: '1rem',
@@ -201,7 +240,7 @@ const InventoryPage = () => {
                       {ingredient?.unit || ''}
                     </div>
                     <div className="font-semibold" style={{ color: '#333' }}>
-                      {ingredient?.name || 'Unknown'}
+                      {ingredient?.name || `Ingredient ${ingredientId}`}
                     </div>
                   </div>
                 </div>

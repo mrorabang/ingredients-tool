@@ -23,16 +23,29 @@ const MultiSelectGrid = ({
   // Get selected items list
   const selectedItemsList = Object.entries(selectedItems)
     .filter(([_, data]) => data)
-    .map(([itemId, data]) => ({
-      id: itemId,
-      ...items.find(item => item.id === parseInt(itemId)),
-      amount: data.amount || '',
-      unit: data.unit
-    }));
+    .map(([itemId, data]) => {
+      // Tìm ingredient theo id (so sánh string với string)
+      const item = items.find(ing => 
+        ing.id === itemId || 
+        ing.id === parseInt(itemId).toString() ||
+        ing.id === parseInt(itemId)
+      );
+      return {
+        id: itemId,
+        ...item,
+        amount: data.amount || '',
+        unit: data.unit
+      };
+    });
 
   // Handle item selection
   const handleItemSelect = (itemId) => {
-    const item = items.find(ing => ing.id === itemId);
+    // Tìm ingredient theo id (so sánh string với string)
+    const item = items.find(ing => 
+      ing.id === itemId || 
+      ing.id === parseInt(itemId).toString() ||
+      ing.id === parseInt(itemId)
+    );
     onSelectionChange(itemId, { amount: '1', unit: item?.unit || 'g' });
   };
 
@@ -229,11 +242,11 @@ const MultiSelectGrid = ({
                     color: '#374151',
                     lineHeight: '1.2'
                   }}>
-                    {item.name} <span style={{ 
+                    {item?.name || `Ingredient ${item.id}`} <span style={{ 
                       fontSize: '0.7rem', 
                       color: '#6b7280',
                       fontWeight: '400'
-                    }}>({item.unit})</span>
+                    }}>({item?.unit || 'g'})</span>
                   </div>
                 </div>
                 <div style={{ 

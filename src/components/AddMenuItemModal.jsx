@@ -91,7 +91,6 @@ const AddMenuItemModal = ({ isOpen, onClose, onSave }) => {
       onSave();
       onClose();
     } catch (error) {
-      console.error('Lỗi khi tạo món mới:', error);
       toastService.error('Có lỗi xảy ra khi tạo món mới!');
     } finally {
       setIsLoading(false);

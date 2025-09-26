@@ -36,3 +36,302 @@
     transform: rotate(360deg);
   }
 }
+
+/* Responsive Design */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Mobile First Approach */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  /* Card responsive */
+  .card {
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+  }
+  
+  /* Grid responsive */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  /* Button responsive */
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Form responsive */
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .form-label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Text responsive */
+  .text-xl {
+    font-size: 1.5rem !important;
+  }
+  
+  .text-lg {
+    font-size: 1.25rem !important;
+  }
+  
+  /* MultiSelectGrid responsive */
+  .multi-select-grid {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .multi-select-grid > div {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+  
+  /* Header responsive */
+  .card h1 {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .card h2 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* Flex responsive */
+  .flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  /* Spacing responsive */
+  .mb-3 {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .mt-3 {
+    margin-top: 0.75rem !important;
+  }
+  
+  .mt-2 {
+    margin-top: 0.5rem !important;
+  }
+  
+  /* Padding responsive */
+  .p-3 {
+    padding: 0.75rem !important;
+  }
+  
+  .p-2 {
+    padding: 0.5rem !important;
+  }
+  
+  /* Grid items responsive */
+  .grid-item {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Modal responsive */
+  .modal-content {
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Table responsive */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  /* Navbar responsive */
+  .navbar {
+    flex-direction: column;
+    padding: 0.5rem;
+    height: auto;
+    min-height: 50px;
+  }
+  
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .nav-item {
+    margin: 0.25rem 0;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+  
+  .user-section {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .user-section > div:first-child {
+    justify-content: center;
+  }
+  
+  .user-section button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Utility classes for responsive */
+.d-mobile-none {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .d-mobile-none {
+    display: block;
+  }
+}
+
+.d-mobile-only {
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .d-mobile-only {
+    display: none;
+  }
+}
+
+/* Text alignment responsive */
+@media (max-width: 768px) {
+  .text-center-mobile {
+    text-align: center;
+  }
+  
+  .text-left-mobile {
+    text-align: left;
+  }
+}
+
+/* Button group responsive */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 769px) {
+  .btn-group {
+    flex-direction: row;
+  }
+}
+
+/* Card header responsive */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 769px) {
+  .card-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Login page responsive */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 0.5rem !important;
+  }
+  
+  .login-card {
+    padding: 2rem !important;
+    margin: 0.5rem !important;
+    max-width: 100% !important;
+  }
+  
+  .login-card h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  .login-card input {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 0.875rem 1rem !important;
+  }
+  
+  .login-card button {
+    font-size: 1rem !important;
+    padding: 0.875rem 1.25rem !important;
+  }
+  
+  .login-card label {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* User section responsive */
+@media (max-width: 768px) {
+  .user-section {
+    order: -1;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+}

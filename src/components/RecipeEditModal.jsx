@@ -22,12 +22,16 @@ const RecipeEditModal = ({
       // Khởi tạo selectedIngredients từ currentRecipe
       const initialSelected = {};
       if (currentRecipe) {
-        console.log('Loading currentRecipe:', currentRecipe);
         Object.entries(currentRecipe).forEach(([ingredientId, data]) => {
-          console.log(`Ingredient ${ingredientId}:`, data);
           // Xử lý cả trường hợp data là object {amount, unit} hoặc chỉ là số
           const amount = typeof data === 'object' ? data.amount : data;
-          const unit = typeof data === 'object' ? data.unit : ingredients.find(ing => ing.id === parseInt(ingredientId))?.unit || 'g';
+          // Tìm ingredient theo id hoặc ingredientId (so sánh string với string)
+          const ingredient = ingredients.find(ing => 
+            ing.id === ingredientId || 
+            ing.id === parseInt(ingredientId).toString() ||
+            ing.ingredientId === parseInt(ingredientId)
+          );
+          const unit = typeof data === 'object' ? data.unit : ingredient?.unit || 'g';
           
           initialSelected[ingredientId] = {
             amount: amount || '',
@@ -35,7 +39,6 @@ const RecipeEditModal = ({
           };
         });
       }
-      console.log('Initial selected ingredients:', initialSelected);
       setSelectedIngredients(initialSelected);
     }
   }, [isOpen, currentRecipe, ingredients]);
@@ -43,12 +46,20 @@ const RecipeEditModal = ({
   // Get selected ingredients list for validation
   const selectedIngredientsList = Object.entries(selectedIngredients)
     .filter(([_, data]) => data)
-    .map(([ingredientId, data]) => ({
-      id: ingredientId,
-      ...ingredients.find(ing => ing.id === parseInt(ingredientId)),
-      amount: data.amount || '',
-      unit: data.unit
-    }));
+    .map(([ingredientId, data]) => {
+      // Tìm ingredient theo id hoặc ingredientId (so sánh string với string)
+      const ingredient = ingredients.find(ing => 
+        ing.id === ingredientId || 
+        ing.id === parseInt(ingredientId).toString() ||
+        ing.ingredientId === parseInt(ingredientId)
+      );
+      return {
+        id: ingredientId,
+        ...ingredient,
+        amount: data.amount || '',
+        unit: data.unit
+      };
+    });
 
   // Handle form submission
   const handleSubmit = async () => {
@@ -75,7 +86,6 @@ const RecipeEditModal = ({
       onSave(recipe);
       onClose();
     } catch (error) {
-      console.error('Lỗi khi lưu công thức:', error);
       toastService.error('Có lỗi xảy ra khi lưu công thức!');
     } finally {
       setIsLoading(false);

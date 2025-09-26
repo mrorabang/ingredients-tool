@@ -42,7 +42,6 @@ const RecipeManagementPage = () => {
       setIsEditModalOpen(false);
       toastService.success('Đã lưu công thức thành công!');
     } catch (error) {
-      console.error('Lỗi khi lưu công thức:', error);
       toastService.error('Có lỗi xảy ra khi lưu công thức!');
     }
   };
@@ -77,13 +76,6 @@ const RecipeManagementPage = () => {
   };
 
   // Debug logging
-  console.log('RecipeManagementPage render:');
-  console.log('- menuItems:', menuItems.length);
-  console.log('- ingredients:', ingredients.length);
-  console.log('- recipes:', Object.keys(recipes).length);
-  console.log('- isLoading:', isLoading);
-  console.log('- menuItems sample:', menuItems.slice(0, 3));
-  console.log('- recipes sample:', Object.keys(recipes).slice(0, 3));
 
   // Show spinner while loading data
   if (isLoading) {
@@ -197,13 +189,18 @@ const RecipeManagementPage = () => {
             }}>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>{item.name}</h4>
               {Object.keys(recipes[item.id] || {}).map(ingredientId => {
-                const ingredient = ingredients.find(ing => ing.id === parseInt(ingredientId));
+                // Tìm ingredient theo id hoặc ingredientId (so sánh string với string)
+                const ingredient = ingredients.find(ing => 
+                  ing.id === ingredientId || 
+                  ing.id === parseInt(ingredientId).toString() ||
+                  ing.ingredientId === parseInt(ingredientId)
+                );
                 const recipeData = recipes[item.id][ingredientId];
                 const amount = typeof recipeData === 'object' ? recipeData.amount : recipeData;
                 const unit = typeof recipeData === 'object' ? recipeData.unit : ingredient?.unit;
                 return (
                   <div key={ingredientId} style={{ fontSize: '0.8rem', color: '#666' }}>
-                    • {ingredient?.name}: {amount} {unit}
+                    • {ingredient?.name || `Ingredient ${ingredientId}`}: {amount} {unit}
                   </div>
                 );
               })}

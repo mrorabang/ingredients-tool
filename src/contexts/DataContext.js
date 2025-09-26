@@ -21,28 +21,19 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log('Bắt đầu load dữ liệu...');
         if (!dataService.isInitialized) {
-          console.log('DataService chưa khởi tạo, đang init...');
           await dataService.init();
         }
-        console.log('DataService đã khởi tạo, đang lấy dữ liệu...');
         
         const menuItemsData = dataService.getMenuItems();
         const ingredientsData = dataService.getIngredients();
         const recipesData = dataService.getAllRecipes();
         
-        console.log('Dữ liệu đã load:', {
-          menuItems: menuItemsData.length,
-          ingredients: ingredientsData.length,
-          recipes: Object.keys(recipesData).length
-        });
-        
         setMenuItems(menuItemsData);
         setIngredients(ingredientsData);
         setRecipes(recipesData);
       } catch (error) {
-        console.error('Error loading data:', error);
+        // Handle error silently
       }
     };
     
@@ -57,7 +48,6 @@ export const DataProvider = ({ children }) => {
       setIngredients(dataService.getIngredients());
       setRecipes(dataService.getAllRecipes());
     } catch (error) {
-      console.error('Error refreshing data:', error);
     } finally {
       setIsLoading(false);
     }
