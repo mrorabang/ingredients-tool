@@ -63,8 +63,9 @@ const MultiSelectGrid = ({
     <div className={`multi-select-grid ${className}`} style={{ 
       display: 'flex',
       gap: '1rem',
-      height: '350px',
-      minHeight: '250px',
+      height: 'auto',
+      minHeight: '300px',
+      maxHeight: '500px',
       flex: 1
     }}>
       {/* Left Column - Available Items */}
@@ -160,13 +161,13 @@ const MultiSelectGrid = ({
                   fontSize: '0.8rem', 
                   fontWeight: '500',
                   color: '#374151',
-                  lineHeight: '1.2'
+                  lineHeight: '1.2',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  flex: 1
                 }}>
-                  {item.name} <span style={{ 
-                    fontSize: '0.7rem', 
-                    color: '#6b7280',
-                    fontWeight: '400'
-                  }}>({item.unit})</span>
+                  {item.name}
                 </div>
                 {selectedItems[item.id] && (
                   <div style={{
@@ -225,9 +226,8 @@ const MultiSelectGrid = ({
             maxHeight: '100%'
           }}>
             {selectedItemsList.map(item => (
-              <div key={item.id} style={{
+              <div key={item.id} className="item-row" style={{
                 display: 'flex',
-                alignItems: 'center',
                 padding: '0.5rem 0.75rem',
                 borderBottom: '1px solid #e2e8f0',
                 background: '#f8fafc',
@@ -235,21 +235,24 @@ const MultiSelectGrid = ({
                 borderRadius: '6px',
                 minHeight: '40px'
               }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
+                <div className="item-content" style={{ 
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: 'hidden'
+                }}>
+                  <div className="item-name" style={{ 
                     fontSize: '0.8rem', 
                     fontWeight: '500',
                     color: '#374151',
-                    lineHeight: '1.2'
+                    lineHeight: '1.2',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}>
-                    {item?.name || `Ingredient ${item.id}`} <span style={{ 
-                      fontSize: '0.7rem', 
-                      color: '#6b7280',
-                      fontWeight: '400'
-                    }}>({item?.unit || 'g'})</span>
+                    {item?.name || `Ingredient ${item.id}`}
                   </div>
                 </div>
-                <div style={{ 
+                <div className="item-controls" style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
                   gap: '0.25rem' 

@@ -73,8 +73,115 @@
   .btn {
     width: 100%;
     margin-bottom: 0.5rem;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    min-height: 36px;
+  }
+  
+  .btn-lg {
+    padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
+    min-height: 42px;
+  }
+  
+  .btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    min-height: 30px;
+  }
+  
+  /* Card responsive */
+  .card {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+  }
+  
+  .card h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Table responsive */
+  .table {
+    font-size: 0.8rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  /* Modal responsive */
+  .modal-content {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-body {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-footer {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* MultiSelectGrid responsive */
+  .multi-select-grid {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 400px !important;
+    max-height: 600px !important;
+  }
+  
+  .multi-select-grid > div {
+    min-height: 200px !important;
+    max-height: 300px !important;
+  }
+  
+  /* Fix text overflow in MultiSelectGrid - Mobile only */
+  .multi-select-grid .item-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+  
+  /* Mobile: 2 rows layout */
+  .multi-select-grid .item-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-height: 60px !important;
+    padding: 0.75rem !important;
+  }
+  
+  .multi-select-grid .item-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .multi-select-grid .item-controls {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.25rem !important;
   }
   
   /* Form responsive */
@@ -172,40 +279,178 @@
   
   /* Navbar responsive */
   .navbar {
-    flex-direction: column;
+    flex-direction: row;
     padding: 0.5rem;
-    height: auto;
-    min-height: 50px;
+    height: 50px;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
   
   .navbar-nav {
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  .nav-item {
-    margin: 0.25rem 0;
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
   }
   
   .nav-link {
-    padding: 0.75rem 1rem;
-    text-align: center;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
   }
   
   .user-section {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
+    flex-shrink: 0;
   }
   
   .user-section > div:first-child {
-    justify-content: center;
+    padding: 0.25rem 0.5rem !important;
   }
   
-  .user-section button {
-    width: 100%;
-    justify-content: center;
+  .user-section > div:first-child > div:first-child {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .user-section > div:first-child > div:last-child {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .user-section > div:first-child {
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  .user-section > div:first-child > div:first-child {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 1rem !important;
+  }
+  
+  .user-section > div:first-child > div:last-child {
+    font-size: 0.85rem !important;
+  }
+  
+  /* Button responsive for desktop */
+  .btn {
+    width: auto;
+    margin-bottom: 0;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+  
+  .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+  
+  .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    min-height: 32px;
+  }
+  
+  /* Card responsive for desktop */
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .card h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Table responsive for desktop */
+  .table {
+    font-size: 0.9rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  /* Modal responsive for desktop */
+  .modal-content {
+    margin: 2rem auto;
+    max-height: calc(100vh - 4rem);
+  }
+  
+  .modal-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .modal-body {
+    padding: 1rem 1.5rem;
+  }
+  
+  .modal-footer {
+    padding: 1rem 1.5rem;
+  }
+  
+  /* MultiSelectGrid responsive for desktop */
+  .multi-select-grid {
+    flex-direction: row !important;
+    height: 400px !important;
+    min-height: 350px !important;
+    max-height: 500px !important;
+  }
+  
+  .multi-select-grid > div {
+    min-height: 300px !important;
+    max-height: 400px !important;
+  }
+  
+  /* Desktop: 1 row layout (original) */
+  .multi-select-grid .item-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 200px !important;
+  }
+  
+  .multi-select-grid .item-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    min-height: 40px !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  .multi-select-grid .item-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .multi-select-grid .item-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
   }
 }
 
@@ -232,6 +477,97 @@
   
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Button responsive for tablet */
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    min-height: 38px;
+  }
+  
+  .btn-lg {
+    padding: 0.65rem 1.3rem;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
+  
+  .btn-sm {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    min-height: 30px;
+  }
+  
+  /* Card responsive for tablet */
+  .card {
+    padding: 1.25rem;
+  }
+  
+  .card h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.875rem;
+  }
+  
+  .card h2 {
+    font-size: 1.375rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  .card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  /* Table responsive for tablet */
+  .table {
+    font-size: 0.85rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.625rem 0.375rem;
+  }
+  
+  /* MultiSelectGrid responsive for tablet */
+  .multi-select-grid {
+    flex-direction: row !important;
+    height: 350px !important;
+    min-height: 300px !important;
+    max-height: 450px !important;
+  }
+  
+  .multi-select-grid > div {
+    min-height: 250px !important;
+    max-height: 350px !important;
+  }
+  
+  /* Tablet: 1 row layout (original) */
+  .multi-select-grid .item-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 150px !important;
+  }
+  
+  .multi-select-grid .item-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    min-height: 40px !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  .multi-select-grid .item-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .multi-select-grid .item-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
   }
 }
 

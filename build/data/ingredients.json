@@ -2,101 +2,181 @@
   {
     "id": 1,
     "name": "Cà phê",
-    "unit": "g"
+    "unit": "g",
+    "category": "Nguyên liệu chính",
+    "description": "Cà phê xay nguyên chất",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 2,
     "name": "Sữa đặc",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Sữa và bơ sữa",
+    "description": "Sữa đặc có đường",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 3,
     "name": "Sữa tươi",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Sữa và bơ sữa",
+    "description": "Sữa tươi thanh trùng",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 4,
     "name": "Bơ",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Bơ tươi chín",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 5,
     "name": "Cacao",
-    "unit": "g"
+    "unit": "g",
+    "category": "Bột và gia vị",
+    "description": "Bột cacao nguyên chất",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 6,
     "name": "Mứt việt quất",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Mứt và siro",
+    "description": "Mứt việt quất tự nhiên",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 7,
     "name": "Cốt dừa",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Sữa và bơ sữa",
+    "description": "Cốt dừa tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 8,
     "name": "Trà gừng",
-    "unit": "gói"
+    "unit": "gói",
+    "category": "Trà và thảo mộc",
+    "description": "Trà gừng túi lọc",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 9,
     "name": "Matcha",
-    "unit": "g"
+    "unit": "g",
+    "category": "Trà và thảo mộc",
+    "description": "Bột trà xanh matcha cao cấp",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 10,
     "name": "Mật ong",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Chất tạo ngọt",
+    "description": "Mật ong nguyên chất",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 11,
     "name": "Sữa Oatside",
-    "unit": "ml"
+    "unit": "ml",
+    "category": "Sữa thực vật",
+    "description": "Sữa yến mạch Oatside",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 12,
     "name": "Rich",
-      "unit": "ml"
+    "unit": "ml",
+    "category": "Sữa và bơ sữa",
+    "description": "Sữa Rich",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 13,
     "name": "Sữa chua",
-      "unit": "hũ"
+    "unit": "hũ",
+    "category": "Sữa chua",
+    "description": "Sữa chua tự nhiên",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 14,
     "name": "Cam sành",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Cam sành tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 15,
     "name": "Thơm",
-    "unit": "miếng"
+    "unit": "miếng",
+    "category": "Trái cây",
+    "description": "Thơm (dứa) tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 16,
     "name": "Dừa",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Dừa tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 17,
     "name": "Táo",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Táo tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 20,
     "name": "Chanh",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Chanh tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 24,
     "name": "Trà bắc",
-    "unit": "g"
+    "unit": "g",
+    "category": "Trà và thảo mộc",
+    "description": "Trà đen truyền thống",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
     "id": 25,
     "name": "Sấu",
-    "unit": "quả"
+    "unit": "quả",
+    "category": "Trái cây",
+    "description": "Sấu tươi",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 ]

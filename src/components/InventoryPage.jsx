@@ -203,7 +203,7 @@ const InventoryPage = () => {
           <button
             className="btn btn-success"
             onClick={handleExportSimple}
-            disabled={isExporting}
+            disabled={isExporting || Object.keys(usedIngredients).length === 0}
             style={{ 
               padding: '0.5rem 1rem',
               fontSize: '0.9rem',
@@ -211,7 +211,9 @@ const InventoryPage = () => {
               alignItems: 'center',
               gap: '0.5rem',
               whiteSpace: 'nowrap',
-              minWidth: 'fit-content'
+              minWidth: 'fit-content',
+              opacity: (isExporting || Object.keys(usedIngredients).length === 0) ? 0.6 : 1,
+              cursor: (isExporting || Object.keys(usedIngredients).length === 0) ? 'not-allowed' : 'pointer'
             }}
           >
             {isExporting ? '⏳' : '📊'} Tải xuống Excel
