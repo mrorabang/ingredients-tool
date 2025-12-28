@@ -6,7 +6,6 @@ import toastService from '../services/toastService';
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +13,7 @@ const LoginPage = () => {
 
   // Kiểm tra đã đăng nhập chưa
   useEffect(() => {
+    authService.setPinLoginEnabled(true);
     if (authService.isAuthenticated()) {
       navigate('/');
     }
@@ -32,7 +32,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.username.trim() || !formData.password.trim()) {
+    if (!formData.password.trim()) {
       toastService.error('Vui lòng nhập đầy đủ thông tin!');
       return;
     }
@@ -40,7 +40,7 @@ const LoginPage = () => {
     setIsLoading(true);
     
     try {
-      const result = await authService.login(formData.username, formData.password);
+      const result = await authService.login(formData.password);
       
       if (result.success) {
         toastService.success(`Chào mừng ${result.user.fullname}!`);
@@ -127,59 +127,6 @@ const LoginPage = () => {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.75rem',
-                color: '#2c3e50',
-                fontWeight: '600',
-                fontSize: '0.95rem'
-              }}>
-                Tên đăng nhập
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Nhập tên đăng nhập"
-                  style={{
-                    width: '100%',
-                    padding: '1rem 1.25rem',
-                    paddingRight: '3rem',
-                    border: '2px solid #e9ecef',
-                    borderRadius: '12px',
-                    fontSize: '1rem',
-                    transition: 'all 0.3s ease',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    backgroundColor: '#fafbfc'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#667eea';
-                    e.target.style.boxShadow = '0 0 0 4px rgba(102, 126, 234, 0.1)';
-                    e.target.style.backgroundColor = 'white';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e9ecef';
-                    e.target.style.boxShadow = 'none';
-                    e.target.style.backgroundColor = '#fafbfc';
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  right: '1.25rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#6c757d',
-                  fontSize: '1.1rem'
-                }}>
-                  👤
-                </div>
-              </div>
-            </div>
-
             <div style={{ marginBottom: '2rem' }}>
               <label style={{
                 display: 'block',
@@ -196,7 +143,7 @@ const LoginPage = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Nhập mật khẩu"
+                  placeholder="Nhập mã PIN"
                   style={{
                     width: '100%',
                     padding: '1rem 1.25rem',

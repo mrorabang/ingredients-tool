@@ -1,15 +1,15 @@
-import mockAPIService from './mockAPIService';
+import firebaseService from './firebaseService';
 import toastService from './toastService';
 
 // Service để quản lý dữ liệu - Đọc/ghi từ file JSON và MockAPI
 class DataService {
   constructor() {
-    // Dữ liệu sẽ được load từ file JSON và MockAPI
+    // Dữ liệu sẽ được load từ Firebase
     this.menuItems = [];
     this.ingredients = [];
     this.recipes = {};
     this.sales = {};
-    this.useMockAPI = true; // Flag để bật/tắt MockAPI
+    this.useFirebase = true; // Flag để bật/tắt Firebase
     this.isInitialized = false; // Flag để kiểm tra đã khởi tạo chưa
   }
 
@@ -37,40 +37,27 @@ class DataService {
   async updateRecipe(itemId, recipe) {
     this.recipes[itemId] = recipe;
     
-    
-    if (this.useMockAPI) {
+    if (this.useFirebase) {
       try {
         const menuItem = this.menuItems.find(item => item.id === itemId);
-        const mockAPIRecipe = mockAPIService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
+        const firebaseRecipe = firebaseService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
         
-        // Debug: Kiểm tra tất cả recipes trước
-        try {
-          await mockAPIService.debugGetAllRecipes();
-        } catch (debugError) {
-        }
-        
-        // Debug: Kiểm tra recipe cụ thể
-        try {
-          await mockAPIService.debugGetRecipeById(itemId);
-        } catch (debugError) {
-        }
-        
-        // Kiểm tra xem recipe đã tồn tại trong MockAPI chưa
-        const recipeExists = await mockAPIService.checkRecipeExists(itemId);
+        // Kiểm tra xem recipe đã tồn tại trong Firebase chưa
+        const recipeExists = await firebaseService.checkRecipeExists(itemId);
         
         if (recipeExists) {
           // Recipe đã tồn tại, cập nhật
-          await mockAPIService.updateRecipe(itemId, mockAPIRecipe);
+          await firebaseService.updateRecipe(itemId, firebaseRecipe);
         } else {
           // Recipe chưa tồn tại, tạo mới
-          await mockAPIService.createRecipe(mockAPIRecipe);
+          await firebaseService.createRecipe(firebaseRecipe);
         }
       } catch (error) {
-        toastService.error('Lỗi khi cập nhật công thức trong MockAPI');
+        toastService.error('Lỗi khi cập nhật công thức trong Firebase');
         throw error;
       }
     } else {
-      await this.saveRecipesToAPI();
+      throw new Error('Firebase không được bật');
     }
   }
 
@@ -80,10 +67,26 @@ class DataService {
     const newItem = { ...item, id: newId };
     this.menuItems.push(newItem);
     
-    if (this.useMockAPI) {
-      // Chỉ lưu vào MockAPI, không fallback local
+    if (this.useFirebase) {
+      try {
+        // Tạo recipe mới trong Firebase
+        const firebaseRecipe = firebaseService.convertToMockAPIFormat(
+          newId,
+          item.ingredients || {},
+          newItem,
+          this.ingredients
+        );
+        
+        console.log('🔍 [DataService] Creating new recipe in Firebase:', firebaseRecipe);
+        await firebaseService.createRecipe(firebaseRecipe);
+        console.log('[DataService] Recipe created successfully in Firebase');
+      } catch (error) {
+        console.error('❌ [DataService] Error creating recipe in Firebase:', error);
+        toastService.error('Lỗi khi tạo công thức trong Firebase');
+        throw error;
+      }
     } else {
-      await this.saveMenuItemsToAPI();
+      throw new Error('Firebase không được bật');
     }
     return newItem;
   }
@@ -94,87 +97,122 @@ class DataService {
     if (index !== -1) {
       this.menuItems[index] = { ...this.menuItems[index], ...updates };
       
-      if (this.useMockAPI) {
-        // Chỉ lưu vào MockAPI, không fallback local
+      if (this.useFirebase) {
+        try {
+          // Cập nhật recipe trong Firebase
+          const firebaseRecipe = firebaseService.convertToMockAPIFormat(
+            itemId,
+            updates.ingredients || this.menuItems[index].ingredients || {},
+            this.menuItems[index],
+            this.ingredients
+          );
+          
+          console.log('🔍 [DataService] Updating recipe in Firebase:', firebaseRecipe);
+          await firebaseService.updateRecipe(itemId, firebaseRecipe);
+          console.log('✅ [DataService] Recipe updated successfully in Firebase');
+        } catch (error) {
+          console.error('❌ [DataService] Error updating recipe in Firebase:', error);
+          toastService.error('Lỗi khi cập nhật công thức trong Firebase');
+          throw error;
+        }
       } else {
-        await this.saveMenuItemsToAPI();
+        throw new Error('Firebase không được bật');
       }
     }
   }
 
   // Xóa món
   async deleteMenuItem(itemId) {
+    console.log('🔍 [DataService] deleteMenuItem - Starting...');
+    console.log('🔍 [DataService] Item ID:', itemId);
+    
     this.menuItems = this.menuItems.filter(item => item.id !== itemId);
     delete this.recipes[itemId];
     
-    if (this.useMockAPI) {
-      // Xóa recipe khỏi MockAPI nếu có
+    if (this.useFirebase) {
+      // Xóa recipe khỏi Firebase nếu có
       try {
-        await mockAPIService.deleteRecipe(itemId);
+        console.log('🔍 [DataService] Deleting recipe from Firebase...');
+        await firebaseService.deleteRecipe(itemId);
+        console.log('✅ [DataService] Recipe deleted successfully from Firebase');
       } catch (error) {
-        toastService.error('Lỗi khi xóa công thức khỏi MockAPI');
+        console.error('❌ [DataService] Error deleting recipe from Firebase:', error);
+        toastService.error('Lỗi khi xóa công thức khỏi Firebase');
         throw error;
       }
     } else {
-      await this.saveMenuItemsToAPI();
-      await this.saveRecipesToAPI();
+      throw new Error('Firebase không được bật');
     }
   }
 
   // Thêm nguyên liệu mới
   async addIngredient(ingredient) {
-    if (this.useMockAPI) {
+    console.log('🔍 [DataService] addIngredient - Starting...');
+    console.log('🔍 [DataService] Ingredient data:', ingredient);
+    
+    if (this.useFirebase) {
       try {
-        const newIngredient = await mockAPIService.createIngredient(ingredient);
+        console.log('🔍 [DataService] Creating ingredient in Firebase...');
+        const newIngredient = await firebaseService.createIngredient(ingredient);
         this.ingredients.push(newIngredient);
+        console.log('✅ [DataService] Ingredient created successfully in Firebase');
         return newIngredient;
       } catch (error) {
-        toastService.error('Lỗi khi tạo nguyên liệu trong MockAPI');
+        console.error('❌ [DataService] Error creating ingredient in Firebase:', error);
+        toastService.error('Lỗi khi tạo nguyên liệu trong Firebase');
         throw error;
       }
     } else {
-      const newId = Math.max(...this.ingredients.map(i => i.id), 0) + 1;
-      const newIngredient = { ...ingredient, id: newId };
-      this.ingredients.push(newIngredient);
-      await this.saveIngredientsToAPI();
-      return newIngredient;
+      throw new Error('Firebase không được bật');
     }
   }
 
   // Cập nhật nguyên liệu
   async updateIngredient(ingredientId, updates) {
+    console.log('🔍 [DataService] updateIngredient - Starting...');
+    console.log('🔍 [DataService] Ingredient ID:', ingredientId);
+    console.log('🔍 [DataService] Updates:', updates);
+    
     const index = this.ingredients.findIndex(ing => ing.id === ingredientId);
     if (index !== -1) {
       this.ingredients[index] = { ...this.ingredients[index], ...updates };
       
-      if (this.useMockAPI) {
+      if (this.useFirebase) {
         try {
-          const ingredientExists = await mockAPIService.checkIngredientExists(ingredientId);
+          console.log('🔍 [DataService] Checking if ingredient exists in Firebase...');
+          const ingredientExists = await firebaseService.checkIngredientExists(ingredientId);
           
           if (ingredientExists) {
-            // Ingredient đã tồn tại, cập nhật
-            await mockAPIService.updateIngredient(ingredientId, this.ingredients[index]);
+            console.log('🔍 [DataService] Ingredient exists, updating in Firebase...');
+            await firebaseService.updateIngredient(ingredientId, this.ingredients[index]);
+            console.log('✅ [DataService] Ingredient updated successfully in Firebase');
           } else {
-            // Ingredient chưa tồn tại, tạo mới
-            await mockAPIService.createIngredient(this.ingredients[index]);
+            console.log('🔍 [DataService] Ingredient does not exist, creating in Firebase...');
+            await firebaseService.createIngredient(this.ingredients[index]);
+            console.log('✅ [DataService] Ingredient created successfully in Firebase');
           }
         } catch (error) {
-          toastService.error('Lỗi khi cập nhật nguyên liệu trong MockAPI');
+          console.error('❌ [DataService] Error updating ingredient in Firebase:', error);
+          toastService.error('Lỗi khi cập nhật nguyên liệu trong Firebase');
           throw error;
         }
       } else {
-        await this.saveIngredientsToAPI();
+        throw new Error('Firebase không được bật');
       }
     }
   }
 
   // Xóa nguyên liệu
   async deleteIngredient(ingredientId) {
+    console.log('🔍 [DataService] deleteIngredient - Starting...');
+    console.log('🔍 [DataService] Ingredient ID:', ingredientId);
     
     // Tìm ingredient trước khi xóa để debug
     const ingredientToDelete = this.ingredients.find(ing => ing.id === ingredientId);
     if (ingredientToDelete) {
+      console.log('🔍 [DataService] Found ingredient to delete:', ingredientToDelete);
     } else {
+      console.log('🔍 [DataService] Ingredient not found in local data');
     }
     
     // Xóa nguyên liệu khỏi local data
@@ -189,24 +227,25 @@ class DataService {
     });
     this.recipes = updatedRecipes;
     
-    if (this.useMockAPI) {
+    if (this.useFirebase) {
       try {
-        // Xóa ingredient trong MockAPI
-        await mockAPIService.deleteIngredient(ingredientId);
+        // Xóa ingredient trong Firebase
+        console.log('🔍 [DataService] Deleting ingredient from Firebase...');
+        await firebaseService.deleteIngredient(ingredientId);
+        console.log('✅ [DataService] Ingredient deleted successfully from Firebase');
         
-        // Cập nhật tất cả recipes trong MockAPI
+        // Cập nhật tất cả recipes trong Firebase
         const updatePromises = Object.keys(this.recipes).map(itemId => 
           this.updateRecipe(itemId, this.recipes[itemId])
         );
         await Promise.all(updatePromises);
         
       } catch (error) {
-        toastService.error('Lỗi khi xóa nguyên liệu trong MockAPI');
+        toastService.error('Lỗi khi xóa nguyên liệu trong Firebase');
         throw error;
       }
     } else {
-      await this.saveIngredientsToAPI();
-      await this.saveRecipesToAPI();
+      throw new Error('Firebase không được bật');
     }
   }
 
@@ -214,17 +253,17 @@ class DataService {
   async addRecipe(itemId, recipe) {
     this.recipes[itemId] = recipe;
     
-    if (this.useMockAPI) {
+    if (this.useFirebase) {
       try {
         const menuItem = this.menuItems.find(item => item.id === itemId);
-        const mockAPIRecipe = mockAPIService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
-        await mockAPIService.createRecipe(mockAPIRecipe);
+        const firebaseRecipe = firebaseService.convertToMockAPIFormat(itemId, recipe, menuItem, this.ingredients);
+        await firebaseService.createRecipe(firebaseRecipe);
       } catch (error) {
-        toastService.error('Lỗi khi tạo công thức trong MockAPI');
+        toastService.error('Lỗi khi tạo công thức trong Firebase');
         throw error;
       }
     } else {
-      await this.saveRecipesToAPI();
+      throw new Error('Firebase không được bật');
     }
   }
 
@@ -232,34 +271,34 @@ class DataService {
   async deleteRecipe(itemId) {
     delete this.recipes[itemId];
     
-    if (this.useMockAPI) {
+    if (this.useFirebase) {
       try {
-        await mockAPIService.deleteRecipe(itemId);
+        await firebaseService.deleteRecipe(itemId);
       } catch (error) {
-        toastService.error('Lỗi khi xóa công thức trong MockAPI');
+        toastService.error('Lỗi khi xóa công thức trong Firebase');
         throw error;
       }
     } else {
-      await this.saveRecipesToAPI();
+      throw new Error('Firebase không được bật');
     }
   }
 
-  // Toggle MockAPI mode
-  toggleMockAPIMode() {
-    this.useMockAPI = !this.useMockAPI;
-    return this.useMockAPI;
+  // Toggle Firebase mode
+  toggleFirebaseMode() {
+    this.useFirebase = !this.useFirebase;
+    return this.useFirebase;
   }
 
-  // Lấy trạng thái MockAPI
-  isMockAPIEnabled() {
-    return this.useMockAPI;
+  // Lấy trạng thái Firebase
+  isFirebaseEnabled() {
+    return this.useFirebase;
   }
 
-  // Kiểm tra trạng thái MockAPI
-  checkMockAPIStatus() {
+  // Kiểm tra trạng thái Firebase
+  checkFirebaseStatus() {
     const status = {
-      mockAPI: {
-        enabled: this.useMockAPI,
+      firebase: {
+        enabled: this.useFirebase,
         ingredients: this.ingredients.length,
         recipes: Object.keys(this.recipes).length,
         menuItems: this.menuItems.length
@@ -296,34 +335,26 @@ class DataService {
     ];
   }
 
-  // Sync dữ liệu từ local lên MockAPI
-  async syncToMockAPI() {
-    if (!this.useMockAPI) {
+  // Sync dữ liệu từ local lên Firebase
+  async syncToFirebase() {
+    if (!this.useFirebase) {
       return;
     }
 
     try {
-      
-      // Sync ingredients
       for (const ingredient of this.ingredients) {
         try {
-          await mockAPIService.createIngredient(ingredient);
+          await firebaseService.createIngredient(ingredient);
         } catch (error) {
-          if (error.message.includes('409')) {
-            // Ingredient đã tồn tại, bỏ qua
-          } else {
-          }
         }
       }
       
-      // Sync recipes
       for (const [itemId, recipe] of Object.entries(this.recipes)) {
         try {
           await this.updateRecipe(itemId, recipe);
         } catch (error) {
         }
       }
-      
     } catch (error) {
     }
   }
@@ -339,29 +370,29 @@ class DataService {
     this.saveSalesToLocalStorage();
   }
 
-  // Đọc dữ liệu từ MockAPI
+  // Đọc dữ liệu từ Firebase
   async loadDataFromAPI() {
-    if (!this.useMockAPI) {
-      throw new Error('MockAPI không được bật');
+    if (!this.useFirebase) {
+      throw new Error('Firebase không được bật');
     }
 
     try {
       
-      // Load ingredients từ MockAPI
-      this.ingredients = await mockAPIService.getAllIngredients();
+      // Load ingredients từ Firebase
+      this.ingredients = await firebaseService.getAllIngredients();
 
-      // Load recipes từ MockAPI
-      const mockAPIRecipes = await mockAPIService.getAllRecipes();
-      this.recipes = mockAPIService.convertFromMockAPIFormat(mockAPIRecipes);
+      // Load recipes từ Firebase
+      const firebaseRecipes = await firebaseService.getAllRecipes();
+      this.recipes = firebaseService.convertFromMockAPIFormat(firebaseRecipes);
 
-      // Load menu items từ MockAPI (tạo từ recipes)
+      // Load menu items từ Firebase (tạo từ recipes)
       this.menuItems = this.getDefaultMenuItems();
 
       // Load sales từ localStorage
       this.loadSalesFromLocalStorage();
       
     } catch (error) {
-      toastService.error('Không thể kết nối đến MockAPI. Vui lòng kiểm tra kết nối mạng.');
+      toastService.error('Không thể kết nối đến Firebase. Vui lòng kiểm tra cấu hình.');
       throw error;
     }
   }
@@ -397,18 +428,17 @@ class DataService {
       return; // Đã khởi tạo rồi
     }
     
-    if (this.useMockAPI) {
-      // Chỉ load từ MockAPI
+    if (this.useFirebase) {
+      // Chỉ load từ Firebase
       try {
         await this.loadDataFromAPI();
       } catch (error) {
-        toastService.error('Không thể kết nối đến MockAPI. Vui lòng kiểm tra kết nối mạng.');
+        toastService.error('Không thể kết nối đến Firebase. Vui lòng kiểm tra cấu hình.');
         throw error;
       }
     } else {
-      // MockAPI bị tắt - không hỗ trợ
-      toastService.error('MockAPI phải được bật để sử dụng ứng dụng');
-      throw new Error('MockAPI phải được bật');
+      toastService.error('Firebase phải được bật để sử dụng ứng dụng');
+      throw new Error('Firebase phải được bật');
     }
     
     this.isInitialized = true;

@@ -61,12 +61,16 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.75rem;
+    overflow-x: auto;
+    min-width: 0;
   }
   
   .grid-2 {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.75rem;
+    overflow-x: auto;
+    min-width: 0;
   }
   
   /* Button responsive */
@@ -146,11 +150,15 @@
     height: auto !important;
     min-height: 400px !important;
     max-height: 600px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   .multi-select-grid > div {
     min-height: 200px !important;
     max-height: 300px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   /* Fix text overflow in MultiSelectGrid - Mobile only */
@@ -275,71 +283,474 @@
   /* Table responsive */
   .table-responsive {
     overflow-x: auto;
+    min-width: 0;
   }
   
-  /* Navbar responsive */
-  .navbar {
-    flex-direction: row;
-    padding: 0.5rem;
-    height: 50px;
-    justify-content: space-between;
-    flex-wrap: wrap;
+  .table {
+    min-width: 600px;
   }
   
-  .navbar-nav {
-    display: flex;
-    gap: 0.25rem;
-    flex-wrap: wrap;
+  /* Fixed navbar spacing */
+  body {
+    padding-top: 60px;
   }
   
-  .nav-link {
-    padding: 0.25rem 0.5rem !important;
-    font-size: 0.8rem !important;
-    white-space: nowrap;
+  .container {
+    padding-top: 2rem;
   }
   
-  .user-section {
-    flex-shrink: 0;
+  /* Inventory page responsive */
+  .card {
+    overflow-x: auto;
+    min-width: 0;
   }
   
-  .user-section > div:first-child {
-    padding: 0.25rem 0.5rem !important;
+  .multi-select-grid {
+    overflow-x: auto;
+    min-width: 0;
   }
   
-  .user-section > div:first-child > div:first-child {
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 0.8rem !important;
+  .grid-3 {
+    overflow-x: auto;
+    min-width: 0;
   }
   
-  .user-section > div:first-child > div:last-child {
-    font-size: 0.75rem !important;
+  .grid-2 {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+  
+  /* Inventory specific components */
+  .inventory-card {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-grid {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-table {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional inventory components */
+  .inventory-summary {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-preview {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-export {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities */
+  .inventory-container {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-content {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-section {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities */
+  .inventory-wrapper {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-panel {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-block {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities */
+  .inventory-item {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-list {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-detail {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities */
+  .inventory-form {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-input {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-button {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Mobile navbar responsive */
+  nav {
+    flex-direction: column !important;
+    height: auto !important;
+    padding: 1rem !important;
+    align-items: stretch !important;
+  }
+  
+  nav > div:first-child {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  nav > div:nth-child(2) {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  nav > div:nth-child(2) a {
+    text-align: center !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  nav > div:last-child {
+    align-self: center;
+  }
+}
+
+/* Tablet */
+@media (min-width: 481px) and (max-width: 768px) {
+  nav {
+    flex-direction: row !important;
+    height: 60px !important;
+    padding: 0 1.5rem !important;
+  }
+  
+  nav > div:first-child {
+    margin-bottom: 0;
+    text-align: left;
+  }
+  
+  nav > div:nth-child(2) {
+    flex-direction: row !important;
+    gap: 1rem !important;
+    width: auto;
+    margin-bottom: 0;
+  }
+  
+  nav > div:nth-child(2) a {
+    text-align: left !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  nav > div:last-child {
+    align-self: center;
+  }
+  
+  /* Inventory page responsive for tablet */
+  .card {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .multi-select-grid {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .grid-3 {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .grid-2 {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+  
+  /* Inventory specific components for tablet */
+  .inventory-card {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-grid {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-table {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional inventory components for tablet */
+  .inventory-summary {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-preview {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-export {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for tablet */
+  .inventory-container {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-content {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-section {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for tablet */
+  .inventory-wrapper {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-panel {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-block {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for tablet */
+  .inventory-item {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-list {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-detail {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for tablet */
+  .inventory-form {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-input {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-button {
+    overflow-x: auto;
+    min-width: 0;
   }
 }
 
 /* Desktop */
 @media (min-width: 769px) {
-  .navbar-nav {
-    gap: 0.5rem;
+  nav {
+    flex-direction: row !important;
+    height: 60px !important;
+    padding: 0 2rem !important;
   }
   
-  .nav-link {
+  nav > div:first-child {
+    margin-bottom: 0;
+    text-align: left;
+  }
+  
+  nav > div:nth-child(2) {
+    flex-direction: row !important;
+    gap: 2rem !important;
+    width: auto;
+    margin-bottom: 0;
+  }
+  
+  nav > div:nth-child(2) a {
+    text-align: left !important;
     padding: 0.5rem 1rem !important;
-    font-size: 0.9rem !important;
-  }
-  
-  .user-section > div:first-child {
-    padding: 0.5rem 0.75rem !important;
-  }
-  
-  .user-section > div:first-child > div:first-child {
-    width: 28px !important;
-    height: 28px !important;
     font-size: 1rem !important;
   }
   
-  .user-section > div:first-child > div:last-child {
-    font-size: 0.85rem !important;
+  nav > div:last-child {
+    align-self: center;
+  }
+  
+  /* Inventory page responsive for desktop */
+  .card {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .multi-select-grid {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .grid-3 {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .grid-2 {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+  
+  /* Inventory specific components for desktop */
+  .inventory-card {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-grid {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-table {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional inventory components for desktop */
+  .inventory-summary {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-preview {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-export {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for desktop */
+  .inventory-container {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-content {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-section {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for desktop */
+  .inventory-wrapper {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-panel {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-block {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  /* Additional responsive utilities for desktop */
+  .inventory-item {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-list {
+    overflow-x: auto;
+    min-width: 0;
+  }
+  
+  .inventory-detail {
+    overflow-x: auto;
+    min-width: 0;
   }
   
   /* Button responsive for desktop */
@@ -417,11 +828,15 @@
     height: 400px !important;
     min-height: 350px !important;
     max-height: 500px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   .multi-select-grid > div {
     min-height: 300px !important;
     max-height: 400px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   /* Desktop: 1 row layout (original) */
@@ -458,10 +873,14 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .grid-3 {
     grid-template-columns: repeat(2, 1fr);
+    overflow-x: auto;
+    min-width: 0;
   }
   
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
+    overflow-x: auto;
+    min-width: 0;
   }
   
   .container {
@@ -473,10 +892,14 @@
 @media (min-width: 1025px) {
   .grid-3 {
     grid-template-columns: repeat(3, 1fr);
+    overflow-x: auto;
+    min-width: 0;
   }
   
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
+    overflow-x: auto;
+    min-width: 0;
   }
   
   /* Button responsive for tablet */
@@ -534,11 +957,15 @@
     height: 350px !important;
     min-height: 300px !important;
     max-height: 450px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   .multi-select-grid > div {
     min-height: 250px !important;
     max-height: 350px !important;
+    overflow-x: auto !important;
+    min-width: 0 !important;
   }
   
   /* Tablet: 1 row layout (original) */

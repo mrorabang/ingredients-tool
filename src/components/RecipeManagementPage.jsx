@@ -6,6 +6,7 @@ import RecipeViewModal from './RecipeViewModal';
 import AddMenuItemModal from './AddMenuItemModal';
 import toastService from '../services/toastService';
 import Spinner from './Spinner';
+import Modal from './Modal';
 
 const RecipeManagementPage = () => {
   // Sử dụng DataContext thay vì load dữ liệu riêng
@@ -17,6 +18,8 @@ const RecipeManagementPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState(null);
   // const [isSaving, setIsSaving] = useState(false);
 
   // Hàm xem công thức
@@ -73,6 +76,37 @@ const RecipeManagementPage = () => {
   const handleAddSuccess = async () => {
     // Refresh data
     updateAllData();
+  };
+
+  // Hàm mở modal xác nhận xóa
+  const confirmDelete = (itemId) => {
+    setDeletingItem(itemId);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Hàm đóng modal xác nhận xóa
+  const cancelDelete = () => {
+    setDeletingItem(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  // Hàm thực hiện xóa món
+  const handleDelete = async () => {
+    if (!deletingItem) return;
+
+    try {
+      // Xóa món từ danh sách món
+      await dataService.deleteMenuItem(deletingItem);
+      // Xóa công thức tương ứng
+      await dataService.deleteRecipe(deletingItem);
+      // Cập nhật lại dữ liệu
+      updateAllData();
+      toastService.success('Đã xóa món thành công!');
+      cancelDelete();
+    } catch (error) {
+      console.error('Lỗi khi xóa món:', error);
+      toastService.error('Có lỗi xảy ra khi xóa món!');
+    }
   };
 
   // Debug logging
@@ -149,20 +183,42 @@ const RecipeManagementPage = () => {
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-1" style={{ flexWrap: 'wrap' }}>
                 <button 
                   onClick={() => startViewing(item.id)}
                   className="btn btn-primary btn-sm"
-                  style={{ flex: 1 }}
+                  style={{ 
+                    flex: '1 1 auto',
+                    minWidth: '60px',
+                    fontSize: '0.8rem',
+                    padding: '0.4rem 0.6rem'
+                  }}
                 >
                    Xem
                 </button>
                 <button 
                   onClick={() => startEditing(item.id)}
                   className="btn btn-success btn-sm"
-                  style={{ flex: 1 }}
+                  style={{ 
+                    flex: '1 1 auto',
+                    minWidth: '60px',
+                    fontSize: '0.8rem',
+                    padding: '0.4rem 0.6rem'
+                  }}
                 >
-                   Chỉnh Sửa
+                   Sửa
+                </button>
+                <button 
+                  onClick={() => confirmDelete(item.id)}
+                  className="btn btn-danger btn-sm"
+                  style={{ 
+                    flex: '1 1 auto',
+                    minWidth: '60px',
+                    fontSize: '0.8rem',
+                    padding: '0.4rem 0.6rem'
+                  }}
+                >
+                   Xóa
                 </button>
               </div>
             </div>
@@ -233,6 +289,38 @@ const RecipeManagementPage = () => {
         onClose={handleCloseAddModal}
         onSave={handleAddSuccess}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={cancelDelete}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div className="text-center">
+          <div className="mb-3" style={{ color: '#dc3545', fontSize: '4rem' }}>
+            ⚠️
+          </div>
+          <h3 className="mb-4">Bạn có chắc chắn muốn xóa món này?</h3>
+          <p className="mb-4">Hành động này không thể hoàn tác. Tất cả công thức của món này sẽ bị xóa vĩnh viễn.</p>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={cancelDelete}
+              className="btn btn-secondary"
+              style={{ minWidth: '100px' }}
+            >
+              Hủy
+            </button>
+            <button
+              onClick={handleDelete}
+              className="btn btn-danger"
+              style={{ minWidth: '100px' }}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

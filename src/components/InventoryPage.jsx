@@ -83,7 +83,13 @@ const InventoryPage = () => {
       const count = salesCount[itemId];
       if (count > 0 && recipes[itemId]) {
         Object.keys(recipes[itemId]).forEach(ingredientId => {
-          const amount = recipes[itemId][ingredientId] * count;
+          const recipeIngredient = recipes[itemId][ingredientId];
+          const baseAmount = typeof recipeIngredient === 'object'
+            ? parseFloat(recipeIngredient?.amount)
+            : parseFloat(recipeIngredient);
+
+          const safeBaseAmount = Number.isFinite(baseAmount) ? baseAmount : 0;
+          const amount = safeBaseAmount * count;
           usedIngredients[ingredientId] = (usedIngredients[ingredientId] || 0) + amount;
         });
       }
@@ -199,7 +205,7 @@ const InventoryPage = () => {
       {/* Tổng kết nguyên liệu đã sử dụng */}
       <div className="card fade-in" style={{ marginBottom: '2rem' }}>
         <div className="card-header">
-          <h2 className="text-lg font-bold mb-0">📦 Tổng Nguyên Liệu Đã Sử Dụng</h2>
+          <h2 className="text-lg font-bold mb-0 text-center" >Tổng Nguyên Liệu Đã Sử Dụng</h2>
           <button
             className="btn btn-success"
             onClick={handleExportSimple}
@@ -216,7 +222,7 @@ const InventoryPage = () => {
               cursor: (isExporting || Object.keys(usedIngredients).length === 0) ? 'not-allowed' : 'pointer'
             }}
           >
-            {isExporting ? '⏳' : '📊'} Tải xuống Excel
+           Tải xuống Excel
           </button>
         </div>
         {Object.keys(usedIngredients).length > 0 ? (
@@ -236,7 +242,7 @@ const InventoryPage = () => {
                 }}>
                   <div className="text-center">
                     <div className="text-lg font-bold text-primary">
-                      {usedIngredients[ingredientId]}
+                      {Number.isFinite(usedIngredients[ingredientId]) ? usedIngredients[ingredientId] : 0}
                     </div>
                     <div className="text-sm text-muted">
                       {ingredient?.unit || ''}
@@ -251,7 +257,7 @@ const InventoryPage = () => {
           </div>
         ) : (
           <div className="text-center" style={{ padding: '2rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}></div>
             <p className="text-muted text-lg">
               Chưa có món nào được bán hôm nay
             </p>

@@ -17,7 +17,7 @@ const HomePage = () => {
             fontSize: '3rem',
             fontWeight: 'bold'
           }}>
-            🍹 Ingredients Tool
+           Kiểm Nguyên Liệu
           </h1>
           <p className="text-lg" style={{ 
             marginBottom: '2rem',

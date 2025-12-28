@@ -194,16 +194,16 @@ const IngredientsPage = () => {
                     className="btn btn-warning btn-sm"
                     style={{ flex: 1 }}
                   >
-                    ✏️ Sửa
+                    Sửa
                   </button>
                   <button
                     onClick={() => handleDelete(ingredient.id)}
                     className="btn btn-danger btn-sm"
                     style={{ flex: 1 }}
                   >
-                    🗑️ Xóa
+                    Xóa
                   </button>
-                </div>
+                </div>  
               </div>
             ))}
           </div>
@@ -262,6 +262,7 @@ const IngredientsPage = () => {
               <option value="l">Liter (l)</option>
               <option value="cái">Cái</option>
               <option value="miếng">Miếng</option>
+              <option value="hũ">Hũ</option>
             </select>
           </div>
 
